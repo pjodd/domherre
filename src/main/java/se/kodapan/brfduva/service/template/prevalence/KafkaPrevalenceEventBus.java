@@ -38,8 +38,9 @@ public class KafkaPrevalenceEventBus<Root> {
     eventSourceBindings = new HashSet<>();
     // todo bindings needs to be registered prior to init!
 
+    // todo topic needs to be set prior to init!
 
-    kafkaReader = new KafkaReader(new KafkaConsumer() {
+    kafkaReader = new KafkaReader(eventSourceTopic, new KafkaConsumer() {
       @Override
       public void consume(KafkaMessage message) {
 

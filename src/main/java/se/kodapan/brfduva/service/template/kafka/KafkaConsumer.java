@@ -6,6 +6,6 @@ package se.kodapan.brfduva.service.template.kafka;
  */
 public interface KafkaConsumer {
 
-  public abstract void consume(KafkaMessage event);
+  public abstract void consume(KafkaMessage message);
 
 }
