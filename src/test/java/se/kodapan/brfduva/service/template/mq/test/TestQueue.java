@@ -1,5 +1,6 @@
 package se.kodapan.brfduva.service.template.mq.test;
 
+import com.google.inject.Singleton;
 import lombok.Data;
 import se.kodapan.brfduva.service.template.mq.MessageQueueMessage;
 import se.kodapan.brfduva.service.template.mq.MessageQueueTopic;
@@ -13,7 +14,7 @@ import java.util.Map;
  * @author kalle
  * @since 2017-02-15 08:45
  */
-@Data
+@Singleton
 public class TestQueue {
 
   private Map<MessageQueueTopic, List<MessageQueueMessage>> queueByTopic = new HashMap<>();

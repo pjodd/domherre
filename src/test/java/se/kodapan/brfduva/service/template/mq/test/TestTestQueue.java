@@ -20,15 +20,21 @@ public class TestTestQueue {
   @Test
   public void test() throws Exception {
 
+    long seed = System.currentTimeMillis();
+    System.out.println("Using seed " + seed);
+    Random random = new Random(seed);
+
+
     ConcurrentLinkedQueue<MessageQueueMessage> writtenMessages = new ConcurrentLinkedQueue<>();
 
     MessageQueueTopic topic = new MessageQueueTopic("test", "test");
 
     TestQueue testQueue = new TestQueue();
 
-    TestQueueReader reader = new TestQueueReader(testQueue);
-    reader.subscribe(topic);
-    reader.setConsumer(new MessageQueueConsumer() {
+    TestQueueReader reader = new TestQueueReader();
+    reader.setTestQueue(testQueue);
+
+    reader.registerConsumer(topic, new MessageQueueConsumer() {
       @Override
       public void consume(MessageQueueMessage message) {
         Assert.assertEquals(writtenMessages.poll(), message);
@@ -36,11 +42,11 @@ public class TestTestQueue {
     });
     reader.open();
 
-    Random random = new Random();
 
-    TestQueueWriter writer = new TestQueueWriter(testQueue);
+    TestQueueWriter writer = new TestQueueWriter();
+    writer.setTestQueue(testQueue);
     for (int i = 0; i < 100; i++) {
-//      System.out.println(i);
+      System.out.println(i);
 
       Thread.sleep(random.nextInt(100 * (random.nextInt(10) == 0 ? 20 : 1)));
 

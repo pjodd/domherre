@@ -1,6 +1,11 @@
 package se.kodapan.brfduva.service.template.prevalence;
 
 import com.google.inject.Inject;
+import com.google.inject.ProvidedBy;
+import com.google.inject.name.Named;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.OffsetDateTime;
 import java.util.concurrent.TimeUnit;
@@ -13,12 +18,21 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 public class Prevalence<Root> {
 
-  @Inject
-  private Root root;
-
   private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
+  private Root root;
+
+  @Inject
+  public Prevalence(@Named("root") Object root) {
+    this.root = (Root)root;
+  }
+
+  @Getter
+  @Setter
   private long defaultLockTimeout = 1;
+
+  @Getter
+  @Setter
   private TimeUnit defaultLockTimemoutUnit = TimeUnit.MINUTES;
 
   public <Response> Response execute(Query<Root, Response> query) throws Exception {
@@ -39,7 +53,7 @@ public class Prevalence<Root> {
   public <Response, Payload> Response execute(Transaction<Root, Payload, Response> transaction, Payload payload) throws Exception {
     if (lock.writeLock().tryLock(defaultLockTimeout, defaultLockTimemoutUnit)) {
       try {
-        return transaction.execute(root, payload, OffsetDateTime.now());
+        return transaction.execute(root, payload);
       } finally {
         lock.writeLock().unlock();
       }
@@ -47,7 +61,5 @@ public class Prevalence<Root> {
       throw new TimeoutException("Unable to achieve write lock");
     }
   }
-
-
 
 }

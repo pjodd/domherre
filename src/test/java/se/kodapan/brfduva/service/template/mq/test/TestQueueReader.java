@@ -1,13 +1,12 @@
 package se.kodapan.brfduva.service.template.mq.test;
 
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
+import com.google.inject.Inject;
+import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import se.kodapan.brfduva.service.template.mq.AbstractMessageQueueReader;
 import se.kodapan.brfduva.service.template.mq.MessageQueueMessage;
-import se.kodapan.brfduva.service.template.mq.MessageQueueReader;
-import se.kodapan.brfduva.service.template.mq.MessageQueueTopic;
-import se.kodapan.brfduva.service.template.mq.kafka.KafkaReader;
 
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -18,19 +17,17 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author kalle
  * @since 2017-02-15 08:45
  */
-public class TestQueueReader extends MessageQueueReader {
+public class TestQueueReader extends AbstractMessageQueueReader {
 
   private Logger log = LoggerFactory.getLogger(getClass());
 
+  @Inject
+  @Setter
+  @Getter
   private TestQueue testQueue;
-  private MessageQueueTopic topic;
 
   private Poller poller;
-
-  public TestQueueReader(TestQueue testQueue) {
-    this.testQueue = testQueue;
-  }
-
+  
   @Override
   public boolean open() throws Exception {
 
@@ -61,11 +58,6 @@ public class TestQueueReader extends MessageQueueReader {
     return success;
   }
 
-  @Override
-  public void subscribe(MessageQueueTopic topic) {
-    this.topic = topic;
-  }
-
 
   private class Poller implements Runnable {
 
@@ -81,16 +73,18 @@ public class TestQueueReader extends MessageQueueReader {
       try {
         while (!stopSignal.get()) {
           try {
-            List<MessageQueueMessage> queue = testQueue.getQueueByTopic(topic);
+            List<MessageQueueMessage> queue = testQueue.getQueueByTopic(getTopic());
             if (queue.size() > previousIndex) {
-              for (int index = previousIndex; index < queue.size(); previousIndex++) {
+              for (int index = previousIndex; index < queue.size(); index++) {
                 MessageQueueMessage message = queue.get(index);
                 try {
                   getConsumer().consume(message);
                 } catch (Exception e) {
-                  // todo
+                  log.warn("Exception while consuming message\n" + message, e);
+                } finally {
+                  previousIndex = index;
                 }
-                previousIndex = index;
+
               }
             }
           } catch (Exception e) {

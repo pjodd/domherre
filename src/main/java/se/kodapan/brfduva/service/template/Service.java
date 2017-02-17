@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
  * @since 2017-02-12 22:14
  */
 @Singleton
-public class Service implements Initializable {
+public class Service  {
 
   private Logger log = LoggerFactory.getLogger(getClass());
 
@@ -21,31 +21,30 @@ public class Service implements Initializable {
   @Inject
   private Binder binder;
 
-  @Override
   public boolean open() throws Exception {
     serviceModule.configure(binder);
 
-    // todo retry for a while if unable
-    for (Initializable initializable : serviceModule.getInitializables()) {
-      if (!initializable.open()) {
-        log.error("Unable to open " + initializable.toString());
-        return false;
-      }
-    }
+//    // todo retry for a while if unable
+//    for (Initializable initializable : serviceModule.getInitializables()) {
+//      if (!initializable.open()) {
+//        log.error("Unable to open " + initializable.toString());
+//        return false;
+//      }
+//    }
 
     return true;
   }
 
-  @Override
   public boolean close() throws Exception {
 
-    // todo retry for a while if unable
-    for (Initializable initializable : serviceModule.getInitializables()) {
-      if (!initializable.close()) {
-        log.error("Unable to close " + initializable.toString());
-        return false;
-      }
-    }
+//    // todo retry for a while if unable
+//    for (Initializable initializable : serviceModule.getInitializables()) {
+//      if (!initializable.close()) {
+//        log.error("Unable to close " + initializable.toString());
+//        return false;
+//      }
+//    }
+
     return true;
   }
 }

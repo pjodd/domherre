@@ -1,5 +1,8 @@
 package se.kodapan.brfduva.service.template.mq.test;
 
+import com.google.inject.Inject;
+import lombok.Getter;
+import lombok.Setter;
 import se.kodapan.brfduva.service.template.mq.MessageQueueMessage;
 import se.kodapan.brfduva.service.template.mq.MessageQueueTopic;
 import se.kodapan.brfduva.service.template.mq.MessageQueueWriter;
@@ -10,10 +13,12 @@ import se.kodapan.brfduva.service.template.mq.MessageQueueWriter;
  */
 public class TestQueueWriter implements MessageQueueWriter {
 
+  @Inject
+  @Getter
+  @Setter
   private TestQueue testQueue;
 
-  public TestQueueWriter(TestQueue testQueue) {
-    this.testQueue = testQueue;
+  public TestQueueWriter() {
   }
 
   @Override

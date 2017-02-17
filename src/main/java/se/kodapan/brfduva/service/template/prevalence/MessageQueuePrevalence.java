@@ -1,11 +1,13 @@
 package se.kodapan.brfduva.service.template.prevalence;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.reflect.ClassPath;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import se.kodapan.brfduva.service.template.Initializable;
 import se.kodapan.brfduva.service.template.mq.*;
 
 import java.time.OffsetDateTime;
@@ -18,20 +20,21 @@ import java.util.concurrent.TimeoutException;
  * @author kalle
  * @since 2017-02-12 22:13
  */
-public class MessageQueuePrevalence<Root> {
+public class MessageQueuePrevalence<Root> implements Initializable {
 
   private Logger log = LoggerFactory.getLogger(getClass());
 
   @Inject
-  private Prevalence<Root> prevalence;
+  private Prevalence prevalence;
 
   @Inject
-  private MessageQueueReader messageQueueReader;
+  private MessageQueueReader journalReader;
 
   @Inject
-  private MessageQueueWriter messageQueueWriter;
+  private MessageQueueWriter journalWriter;
 
   @Inject
+  @Named("prevalence journal topic")
   private MessageQueueTopic eventSourceTopic;
 
   @Inject
@@ -40,28 +43,51 @@ public class MessageQueuePrevalence<Root> {
 
   private Map<UUID, AwaitedTransactionExecution> awaitedTransactionExecutions;
 
-  public boolean init() {
+  @Override
+  public boolean open() throws Exception {
+
+    if (!journalReader.open()) {
+      return false;
+    }
 
     awaitedTransactionExecutions = new HashMap<>();
 
+    log.info("Scanning for transaction classes in classpath...");
     eventSourceBindings = new HashSet<>();
-    // todo bindings needs to be registered prior to init!
+    ClassLoader cl = getClass().getClassLoader();
+    Set<ClassPath.ClassInfo> classesInPackage = ClassPath.from(cl).getAllClasses();
+    for (ClassPath.ClassInfo classInfo : classesInPackage) {
+      Class transactionClass;
+      try {
+        transactionClass = classInfo.load();
+      } catch (NoClassDefFoundError e) {
+//        log.debug("Exception while inspecting class " + classInfo.getName(), e);
+        continue;
+      }
+      if (!transactionClass.equals(Transaction.class) && Transaction.class.isAssignableFrom(transactionClass)) {
+        Transaction transaction = (Transaction) transactionClass.newInstance();
+        registerEventSourceBinding(
+            transaction.getStereotype(),
+            transaction.getVersion(),
+            transaction.getPayloadClass(),
+            transactionClass
+        );
+      }
+    }
+    log.info("Bound " + eventSourceBindings.size() + " transaction classes in classpath.");
 
-    // todo topic needs to be set prior to init!
-
-    messageQueueReader.subscribe(eventSourceTopic);
-    messageQueueReader.setConsumer(new MessageQueueConsumer() {
+    journalReader.registerConsumer(eventSourceTopic, new MessageQueueConsumer() {
       @Override
       public void consume(MessageQueueMessage message) {
 
         AwaitedTransactionExecution awaitedTransactionExecution = awaitedTransactionExecutions.get(message.getIdentity());
         try {
-          
+
           EventSourceBinding binding = findBinding(message.getStereotype(), message.getVersion());
 
           if (binding == null) {
             log.error("No binding for event\n" + message);
-            return;
+
           } else {
 
             Object payload;
@@ -75,8 +101,10 @@ public class MessageQueuePrevalence<Root> {
             }
             try {
               Object response = prevalence.execute(transaction, payload);
-              awaitedTransactionExecution.setTransactionResponse(response);
-              awaitedTransactionExecution.setExecuted(OffsetDateTime.now());
+              if (awaitedTransactionExecution != null) {
+                awaitedTransactionExecution.setTransactionResponse(response);
+                awaitedTransactionExecution.setExecuted(OffsetDateTime.now());
+              }
             } catch (Exception e) {
               log.error("Exception while executing transaction", e);
               if (awaitedTransactionExecution != null) {
@@ -97,9 +125,18 @@ public class MessageQueuePrevalence<Root> {
     return true;
   }
 
+  @Override
+  public boolean close() throws Exception {
+    if (!journalReader.close()) {
+      return false;
+    }
+    return true;
+  }
+
+
   @Data
   private static class AwaitedTransactionExecution {
-    private UUID eventIdentity;
+    private UUID messageIdentity;
     private OffsetDateTime created;
     private OffsetDateTime executed;
     private Exception transactionExecutionException;
@@ -111,13 +148,13 @@ public class MessageQueuePrevalence<Root> {
   private long defaultExecuteTimeoutAmount = 1;
 
   public <Response, Payload> Response execute(
-      Class<Transaction<Root, Payload, Response>> transactionClass,
+      Class<? extends Transaction<Root, Payload, Response>> transactionClass,
       Payload payload) throws Exception {
     return execute(transactionClass, payload, defaultExecuteTimeoutUnit, defaultExecuteTimeoutAmount);
   }
 
   public <Response, Payload> Response execute(
-      Class<Transaction<Root, Payload, Response>> transactionClass,
+      Class<? extends Transaction<Root, Payload, Response>> transactionClass,
       Payload payload,
       TimeUnit timeoutUnit,
       long timeoutAmount
@@ -136,12 +173,13 @@ public class MessageQueuePrevalence<Root> {
     message.setVersion(eventSourceBinding.getVersion());
 
     AwaitedTransactionExecution awaitedTransactionExecution = new AwaitedTransactionExecution();
+    awaitedTransactionExecution.setMessageIdentity(message.getIdentity());
     awaitedTransactionExecution.setDoneSignal(new CountDownLatch(1));
-    awaitedTransactionExecution.setEventIdentity(message.getIdentity());
+    awaitedTransactionExecution.setMessageIdentity(message.getIdentity());
     awaitedTransactionExecution.setCreated(OffsetDateTime.now());
-    awaitedTransactionExecutions.put(awaitedTransactionExecution.getEventIdentity(), awaitedTransactionExecution);
+    awaitedTransactionExecutions.put(awaitedTransactionExecution.getMessageIdentity(), awaitedTransactionExecution);
 
-    messageQueueWriter.write(eventSourceTopic, message);
+    journalWriter.write(eventSourceTopic, message);
 
     if (!awaitedTransactionExecution.getDoneSignal().await(timeoutAmount, timeoutUnit)) {
       // todo pass down doneSignal?
@@ -180,6 +218,8 @@ public class MessageQueuePrevalence<Root> {
     }
     binding = new EventSourceBinding(stereotype, version, payloadClass, transactionClass);
     eventSourceBindings.add(binding);
+
+    log.info("Registered event source binding " + binding);
   }
 
   private Set<EventSourceBinding> eventSourceBindings;

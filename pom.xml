@@ -26,9 +26,9 @@
     </dependency>
 
     <dependency>
-      <groupId>com.google.cloud.trace</groupId>
-      <artifactId>guice-annotation</artifactId>
-      <version>0.3.1</version>
+      <groupId>com.google.inject</groupId>
+      <artifactId>guice</artifactId>
+      <version>4.1.0</version>
     </dependency>
 
     <dependency>

@@ -6,11 +6,15 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import se.kodapan.brfduva.service.template.mq.AbstractMessageQueueReader;
+import se.kodapan.brfduva.service.template.mq.MessageQueueConsumer;
 import se.kodapan.brfduva.service.template.mq.MessageQueueMessage;
-import se.kodapan.brfduva.service.template.mq.MessageQueueReader;
 import se.kodapan.brfduva.service.template.mq.MessageQueueTopic;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Properties;
+import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -19,7 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author kalle
  * @since 2017-02-12 22:05
  */
-public class KafkaReader extends MessageQueueReader {
+public class KafkaReader extends AbstractMessageQueueReader {
 
   private Logger log = LoggerFactory.getLogger(getClass());
 
@@ -33,7 +37,8 @@ public class KafkaReader extends MessageQueueReader {
   }
 
   @Override
-  public void subscribe(MessageQueueTopic topic) {
+  public void registerConsumer(MessageQueueTopic topic, MessageQueueConsumer consumer) {
+    super.registerConsumer(topic, consumer);
     kafkaConsumer.subscribe(Collections.singletonList(topic.toString()));
   }
 
@@ -97,6 +102,10 @@ public class KafkaReader extends MessageQueueReader {
       try {
         while (!stopSignal.get()) {
           try {
+            if (getConsumer() == null) {
+              Thread.sleep(TimeUnit.SECONDS.toMillis(1));
+              continue;
+            }
             ConsumerRecords<String, String> records = kafkaConsumer.poll(TimeUnit.SECONDS.toMillis(1));
             try {
               if (!records.isEmpty()) {
@@ -105,7 +114,7 @@ public class KafkaReader extends MessageQueueReader {
                   try {
                     getConsumer().consume(message);
                   } catch (Exception e) {
-                    // todo
+                    log.error("Exception while consuming message\n" + message, e);
                   }
                 }
               }
@@ -113,10 +122,7 @@ public class KafkaReader extends MessageQueueReader {
               kafkaConsumer.commitAsync();
             }
           } catch (Exception e) {
-            // todo
-
-          } finally {
-
+            log.error("Exception in Kafka poller thread", e);
           }
         }
       } finally {

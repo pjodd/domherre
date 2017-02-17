@@ -8,6 +8,11 @@ import java.time.OffsetDateTime;
  */
 public interface Transaction<Root, Payload, Response> {
 
-  public abstract <Response> Response execute(Root root, Payload payload, OffsetDateTime date) throws Exception;
+  public abstract String getStereotype();
+  public abstract Integer getVersion();
+  public abstract Class<Payload> getPayloadClass();
+  public abstract Class<Response> getResponseClass();
+
+  public abstract Response execute(Root root, Payload payload) throws Exception;
 
 }
