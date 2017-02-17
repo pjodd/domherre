@@ -1,4 +1,4 @@
-package se.kodapan.brfduva.service.template.kafka;
+package se.kodapan.brfduva.service.template.mq;
 
 import lombok.Data;
 import org.json.JSONObject;
@@ -9,10 +9,10 @@ import java.util.UUID;
 
 /**
  * @author kalle
- * @since 2017-02-12 22:16
+ * @since 2017-02-13 23:02
  */
 @Data
-public class KafkaMessage {
+public class MessageQueueMessage {
 
   public UUID identity;
   public OffsetDateTime created;
@@ -22,10 +22,9 @@ public class KafkaMessage {
 
   public String payload;
 
-
-  public static KafkaMessage fromJSON(String raw) {
+  public static MessageQueueMessage fromJSON(String raw) {
     JSONObject json = new JSONObject(new JSONTokener(raw));
-    KafkaMessage message = new KafkaMessage();
+    MessageQueueMessage message = new MessageQueueMessage();
     message.setIdentity(UUID.fromString(json.getString("identity")));
     message.setCreated(OffsetDateTime.parse(json.getString("created")));
     message.setStereotype(json.getString("stereotype"));

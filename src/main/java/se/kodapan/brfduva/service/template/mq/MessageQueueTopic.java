@@ -1,4 +1,4 @@
-package se.kodapan.brfduva.service.template.kafka;
+package se.kodapan.brfduva.service.template.mq;
 
 import lombok.Data;
 
@@ -7,12 +7,14 @@ import lombok.Data;
  * @since 2017-02-12 22:05
  */
 @Data
-public class KafkaTopic {
+public class MessageQueueTopic {
 
   private String name;
+
+  /** event-source, command, etc */
   private String stereotype;
 
-  public KafkaTopic(String name, String stereotype) {
+  public MessageQueueTopic(String name, String stereotype) {
     // todo assert not too long
     // todo assert lower case
     // todo assert stereotype only alpha

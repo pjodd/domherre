@@ -1,10 +1,12 @@
 package se.kodapan.brfduva.service.template.prevalence;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import se.kodapan.brfduva.service.template.kafka.*;
+import se.kodapan.brfduva.service.template.mq.*;
 
 import java.time.OffsetDateTime;
 import java.util.*;
@@ -16,18 +18,25 @@ import java.util.concurrent.TimeoutException;
  * @author kalle
  * @since 2017-02-12 22:13
  */
-public class KafkaPrevalenceEventBus<Root> {
+public class MessageQueuePrevalence<Root> {
 
   private Logger log = LoggerFactory.getLogger(getClass());
 
+  @Inject
   private Prevalence<Root> prevalence;
 
-  private KafkaReader kafkaReader;
+  @Inject
+  private MessageQueueReader messageQueueReader;
 
-  private KafkaWriter kafkaWriter;
-  private KafkaTopic eventSourceTopic;
+  @Inject
+  private MessageQueueWriter messageQueueWriter;
 
+  @Inject
+  private MessageQueueTopic eventSourceTopic;
+
+  @Inject
   private ObjectMapper objectMapper;
+
 
   private Map<UUID, AwaitedTransactionExecution> awaitedTransactionExecutions;
 
@@ -40,9 +49,10 @@ public class KafkaPrevalenceEventBus<Root> {
 
     // todo topic needs to be set prior to init!
 
-    kafkaReader = new KafkaReader(eventSourceTopic, new KafkaConsumer() {
+    messageQueueReader.subscribe(eventSourceTopic);
+    messageQueueReader.setConsumer(new MessageQueueConsumer() {
       @Override
-      public void consume(KafkaMessage message) {
+      public void consume(MessageQueueMessage message) {
 
         AwaitedTransactionExecution awaitedTransactionExecution = awaitedTransactionExecutions.get(message.getIdentity());
         try {
@@ -118,20 +128,20 @@ public class KafkaPrevalenceEventBus<Root> {
       throw new IllegalStateException("No binding for " + transactionClass.getName());
     }
 
-    KafkaMessage kafkaMessage = new KafkaMessage();
-    kafkaMessage.setIdentity(UUID.randomUUID());
-    kafkaMessage.setCreated(OffsetDateTime.now());
-    kafkaMessage.setPayload(objectMapper.writeValueAsString(payload));
-    kafkaMessage.setStereotype(eventSourceBinding.getStereotype());
-    kafkaMessage.setVersion(eventSourceBinding.getVersion());
+    MessageQueueMessage message = new MessageQueueMessage();
+    message.setIdentity(UUID.randomUUID());
+    message.setCreated(OffsetDateTime.now());
+    message.setPayload(objectMapper.writeValueAsString(payload));
+    message.setStereotype(eventSourceBinding.getStereotype());
+    message.setVersion(eventSourceBinding.getVersion());
 
     AwaitedTransactionExecution awaitedTransactionExecution = new AwaitedTransactionExecution();
     awaitedTransactionExecution.setDoneSignal(new CountDownLatch(1));
-    awaitedTransactionExecution.setEventIdentity(kafkaMessage.getIdentity());
+    awaitedTransactionExecution.setEventIdentity(message.getIdentity());
     awaitedTransactionExecution.setCreated(OffsetDateTime.now());
     awaitedTransactionExecutions.put(awaitedTransactionExecution.getEventIdentity(), awaitedTransactionExecution);
 
-    kafkaWriter.write(eventSourceTopic, kafkaMessage);
+    messageQueueWriter.write(eventSourceTopic, message);
 
     if (!awaitedTransactionExecution.getDoneSignal().await(timeoutAmount, timeoutUnit)) {
       // todo pass down doneSignal?
