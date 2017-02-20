@@ -9,6 +9,7 @@ import se.kodapan.brfduva.service.template.mq.AbstractMessageQueueReader;
 import se.kodapan.brfduva.service.template.mq.MessageQueueMessage;
 
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -27,9 +28,11 @@ public class TestQueueReader extends AbstractMessageQueueReader {
   private TestQueue testQueue;
 
   private Poller poller;
-  
+
   @Override
   public boolean open() throws Exception {
+
+    log.info("Opening test queue reader");
 
     poller = new Poller();
     Thread pollerThread = new Thread(poller);
@@ -64,34 +67,29 @@ public class TestQueueReader extends AbstractMessageQueueReader {
     private AtomicBoolean stopSignal;
     private CountDownLatch doneSignal;
 
-    private int previousIndex = 0;
 
     @Override
     public void run() {
+
+
+      log.info("Starting reader poller thread");
       stopSignal = new AtomicBoolean(false);
       doneSignal = new CountDownLatch(1);
       try {
         while (!stopSignal.get()) {
           try {
-            List<MessageQueueMessage> queue = testQueue.getQueueByTopic(getTopic());
-            if (queue.size() > previousIndex) {
-              for (int index = previousIndex; index < queue.size(); index++) {
-                MessageQueueMessage message = queue.get(index);
-                try {
-                  getConsumer().consume(message);
-                } catch (Exception e) {
-                  log.warn("Exception while consuming message\n" + message, e);
-                } finally {
-                  previousIndex = index;
-                }
-
+            ConcurrentLinkedQueue<MessageQueueMessage> queue = testQueue.getQueueByTopic(getTopic());
+            MessageQueueMessage message;
+            while ((message = queue.poll()) != null) {
+              try {
+                getConsumer().consume(message);
+              } catch (Exception e) {
+                log.warn("Exception while consuming message\n" + message, e);
               }
             }
+            Thread.sleep(1000);
           } catch (Exception e) {
-            // todo
-
-          } finally {
-
+            log.error("Caught exception", e);
           }
         }
       } finally {

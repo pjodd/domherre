@@ -2,13 +2,13 @@ package se.kodapan.brfduva.service.template.mq.test;
 
 import com.google.inject.Singleton;
 import lombok.Data;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import se.kodapan.brfduva.service.template.mq.MessageQueueMessage;
 import se.kodapan.brfduva.service.template.mq.MessageQueueTopic;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * @author kalle
@@ -17,12 +17,15 @@ import java.util.Map;
 @Singleton
 public class TestQueue {
 
-  private Map<MessageQueueTopic, List<MessageQueueMessage>> queueByTopic = new HashMap<>();
+  private Logger log = LoggerFactory.getLogger(getClass());
 
-  public synchronized List<MessageQueueMessage> getQueueByTopic(MessageQueueTopic topic) {
-    List<MessageQueueMessage> queue = queueByTopic.get(topic);
+  private Map<MessageQueueTopic, ConcurrentLinkedQueue<MessageQueueMessage>> queueByTopic = new HashMap<>();
+
+  public synchronized ConcurrentLinkedQueue<MessageQueueMessage> getQueueByTopic(MessageQueueTopic topic) {
+    ConcurrentLinkedQueue<MessageQueueMessage> queue = queueByTopic.get(topic);
     if (queue == null) {
-      queue = new ArrayList<>();
+      log.debug("Created queue with topic '" + topic + "'");
+      queue = new ConcurrentLinkedQueue<>();
       queueByTopic.put(topic, queue);
     }
     return queue;

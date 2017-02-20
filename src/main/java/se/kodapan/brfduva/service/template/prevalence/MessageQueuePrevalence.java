@@ -46,7 +46,8 @@ public class MessageQueuePrevalence<Root> implements Initializable {
   @Override
   public boolean open() throws Exception {
 
-    if (!journalReader.open()) {
+    if (eventSourceTopic == null) {
+      log.error("No event source topic set");
       return false;
     }
 
@@ -79,6 +80,8 @@ public class MessageQueuePrevalence<Root> implements Initializable {
     journalReader.registerConsumer(eventSourceTopic, new MessageQueueConsumer() {
       @Override
       public void consume(MessageQueueMessage message) {
+
+        log.debug("Incoming message " + message);
 
         AwaitedTransactionExecution awaitedTransactionExecution = awaitedTransactionExecutions.get(message.getIdentity());
         try {
@@ -122,6 +125,11 @@ public class MessageQueuePrevalence<Root> implements Initializable {
       }
     });
 
+    if (!journalReader.open()) {
+      log.error("Unable to open journal reader");
+      return false;
+    }
+
     return true;
   }
 
@@ -159,6 +167,8 @@ public class MessageQueuePrevalence<Root> implements Initializable {
       TimeUnit timeoutUnit,
       long timeoutAmount
   ) throws Exception {
+
+    log.debug("Executing " + transactionClass.getName() + " using payload " + payload);
 
     EventSourceBinding eventSourceBinding = findBinding(transactionClass);
     if (eventSourceBinding == null) {
