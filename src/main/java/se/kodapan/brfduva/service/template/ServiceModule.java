@@ -1,14 +1,17 @@
 package se.kodapan.brfduva.service.template;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.Provides;
 import com.google.inject.name.Named;
 import se.kodapan.brfduva.service.template.mq.MessageQueueTopic;
 
-import java.util.Collection;
-import java.util.Collections;
+import javax.inject.Singleton;
 
 /**
  * @author kalle
@@ -31,28 +34,33 @@ public abstract class ServiceModule implements Module {
 
   @Provides
   @Named("root")
-  public Object rootProvider() throws Exception {
+  public Object rootFactory() throws Exception {
     return rootClass.newInstance();
 
   }
 
   @Provides
   @Named("service name")
-  public String serviceNameProvider() {
+  public String serviceNameFactory() {
     return serviceName;
   }
 
+  @Singleton
   @Provides
   @Named("prevalence journal topic")
-  public MessageQueueTopic prevalenceJournalTopicProvider() {
+  public MessageQueueTopic prevalenceJournalTopicFactory() {
     return new MessageQueueTopic(serviceName, "prevalence-journal");
-
   }
 
   @Provides
+  @Singleton
   public ObjectMapper objectMapperFactory() {
-    // todo dates and what not
-    return new ObjectMapper();
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+    mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+    mapper.registerModule(new JavaTimeModule());
+    return mapper;
   }
 
 }
