@@ -1,4 +1,4 @@
-package se.kodapan.brfduva.service.template.mq.test;
+package se.kodapan.brfduva.service.template.mq.kafka;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -12,13 +12,12 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author kalle
- * @since 2017-02-15 09:01
+ * @since 2017-02-23 01:04
  */
-public class TestTestQueue {
+public class TestKafka {
 
   @Test
   public void test() throws Exception {
@@ -32,10 +31,7 @@ public class TestTestQueue {
 
     MessageQueueTopic topic = new MessageQueueTopic("test-" + System.currentTimeMillis(), "test");
 
-    TestQueue testQueue = new TestQueue();
-
-    TestQueueReader reader = new TestQueueReader();
-    reader.setTestQueue(testQueue);
+    KafkaReader reader = new KafkaReader();
     Assert.assertTrue(reader.open());
 
     final List<MessageQueueMessage> consumed = new ArrayList<>();
@@ -48,8 +44,7 @@ public class TestTestQueue {
     });
 
 
-    TestQueueWriter writer = new TestQueueWriter();
-    writer.setTestQueue(testQueue);
+    KafkaWriter writer = new KafkaWriter();
     Assert.assertTrue(writer.open());
 
     for (int i = 0; i < 100; i++) {
@@ -71,6 +66,6 @@ public class TestTestQueue {
     Thread.sleep(5000);
     Assert.assertEquals(100, consumed.size());
 
-  }
 
+  }
 }

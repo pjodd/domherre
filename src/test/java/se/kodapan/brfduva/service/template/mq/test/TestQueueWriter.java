@@ -25,4 +25,14 @@ public class TestQueueWriter implements MessageQueueWriter {
   public void write(MessageQueueTopic topic, MessageQueueMessage message) throws Exception {
     testQueue.getQueueByTopic(topic).add(message);
   }
+
+  @Override
+  public boolean open() throws Exception {
+    return testQueue != null;
+  }
+
+  @Override
+  public boolean close() throws Exception {
+    return true;
+  }
 }

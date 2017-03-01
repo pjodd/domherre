@@ -1,9 +1,7 @@
 package se.kodapan.brfduva.service.template.prevalence;
 
 import com.google.inject.Inject;
-import com.google.inject.ProvidedBy;
 import com.google.inject.name.Named;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;

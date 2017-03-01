@@ -10,6 +10,7 @@ import se.kodapan.brfduva.service.template.mq.AbstractMessageQueueReader;
 import se.kodapan.brfduva.service.template.mq.MessageQueueConsumer;
 import se.kodapan.brfduva.service.template.mq.MessageQueueMessage;
 import se.kodapan.brfduva.service.template.mq.MessageQueueTopic;
+import se.kodapan.brfduva.service.template.util.Environment;
 
 import java.util.Collections;
 import java.util.Map;
@@ -30,7 +31,7 @@ public class KafkaReader extends AbstractMessageQueueReader {
   private Poller poller;
   private Consumer<String, String> kafkaConsumer;
 
-  private String kafkaBootstrapList = ""; // todo IP from environment variable
+  private String kafkaBootstrapList = Environment.getValue("kafka.bootstrap.servers","172.17.0.3:9092");
 
   private Map<String, String> getAdditionalKafkaProperties() {
     return Collections.EMPTY_MAP;
@@ -54,9 +55,9 @@ public class KafkaReader extends AbstractMessageQueueReader {
 
     config.putAll(getAdditionalKafkaProperties());
 
-    log.trace("Opened Kafka kafkaConsumer using config " + config);
-
     kafkaConsumer = new KafkaConsumer<>(config);
+
+    log.trace("Opened Kafka kafkaConsumer using config " + config);
 
     poller = new Poller();
     Thread pollerThread = new Thread(poller);
