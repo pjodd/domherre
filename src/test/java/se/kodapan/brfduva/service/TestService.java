@@ -32,7 +32,7 @@ public class TestService {
 
     Service service = new Service() {
       @Override
-      public List<Module> getAdditionalModules() {
+      public List<Module> getModules() {
         List<Module> modules = new ArrayList<>();
         modules.add(serviceModule);
         return modules;

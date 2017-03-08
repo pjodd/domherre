@@ -1,5 +1,9 @@
 package se.kodapan.brfduva.service.template.servlet;
 
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
+import lombok.Data;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -12,6 +16,10 @@ import javax.ws.rs.core.MediaType;
 @Path("api")
 public class Ping {
 
+  @Inject
+  @Named("service name")
+  private String serviceName;
+
   @Path("ping")
   @GET
   @Produces(MediaType.APPLICATION_JSON)
@@ -19,8 +27,9 @@ public class Ping {
     return new Pong();
   }
 
-  public static class Pong {
-    
+  @Data
+  public class Pong {
+    private String serviceName = Ping.this.serviceName;
   }
 
 }

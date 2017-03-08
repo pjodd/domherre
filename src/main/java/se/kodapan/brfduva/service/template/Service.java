@@ -30,7 +30,7 @@ public class Service {
   public boolean open() throws Exception {
 
     List<Module> modules = new ArrayList<>();
-    modules.addAll(getAdditionalModules());
+    modules.addAll(getModules());
     modules.add(new ServletModule());
     injector = Guice.createInjector(modules);
 
@@ -94,7 +94,7 @@ public class Service {
     return Collections.emptyList();
   }
 
-  public List<Module> getAdditionalModules() {
+  public List<Module> getModules() {
     return Collections.emptyList();
   }
 }
