@@ -5,7 +5,7 @@ import org.gwizard.services.Run;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.kodapan.brfduva.service.template.prevalence.MessageQueuePrevalence;
-import se.kodapan.brfduva.service.template.rest.ServletModule;
+import se.kodapan.brfduva.service.template.servlet.ServletModule;
 
 import java.util.ArrayList;
 import java.util.Collections;

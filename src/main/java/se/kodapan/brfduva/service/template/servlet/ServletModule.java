@@ -1,11 +1,9 @@
-package se.kodapan.brfduva.service.template.rest;
+package se.kodapan.brfduva.service.template.servlet;
 
 import com.google.common.reflect.ClassPath;
 import org.gwizard.rest.RestModule;
-import org.gwizard.services.Run;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import se.kodapan.brfduva.service.template.rest.Ping;
 
 import javax.ws.rs.Path;
 import java.io.IOException;

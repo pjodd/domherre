@@ -1,4 +1,4 @@
-package se.kodapan.brfduva.service.template.rest;
+package se.kodapan.brfduva.service.template.servlet;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;

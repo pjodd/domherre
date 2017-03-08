@@ -6,16 +6,12 @@ import com.google.inject.name.Names;
 import junit.framework.Assert;
 import lombok.Data;
 import org.junit.Test;
-import se.kodapan.brfduva.service.template.Initializable;
 import se.kodapan.brfduva.service.template.Service;
 import se.kodapan.brfduva.service.template.ServiceModule;
-import se.kodapan.brfduva.service.template.rest.ServletModule;
 import se.kodapan.brfduva.service.template.mq.MessageQueueFactory;
 import se.kodapan.brfduva.service.template.mq.test.TestQueueFactory;
-import se.kodapan.brfduva.service.template.prevalence.MessageQueuePrevalence;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
