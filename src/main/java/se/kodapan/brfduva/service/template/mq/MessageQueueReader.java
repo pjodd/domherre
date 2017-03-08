@@ -1,6 +1,7 @@
 package se.kodapan.brfduva.service.template.mq;
 
 import lombok.Data;
+import lombok.Getter;
 import se.kodapan.brfduva.service.template.Initializable;
 
 /**
@@ -9,6 +10,9 @@ import se.kodapan.brfduva.service.template.Initializable;
  */
 public interface MessageQueueReader extends Initializable {
 
-  public abstract void registerConsumer(MessageQueueTopic topic, MessageQueueConsumer consumer);
+  public abstract MessageQueueTopic getTopic();
+
+  public abstract MessageQueueConsumer getConsumer();
+
 
 }

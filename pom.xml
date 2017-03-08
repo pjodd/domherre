@@ -13,7 +13,8 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <jettyVersion>7.2.0.v20101020</jettyVersion>
+    <gwizard.version>0.7</gwizard.version>
+    <dropwizard.version>0.8.1</dropwizard.version>
   </properties>
 
 
@@ -23,12 +24,31 @@
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
       <version>1.16.12</version>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>com.google.inject</groupId>
       <artifactId>guice</artifactId>
       <version>4.1.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.google.inject.extensions</groupId>
+      <artifactId>guice-servlet</artifactId>
+      <version>4.1.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.gwizard</groupId>
+      <artifactId>gwizard-rest</artifactId>
+      <version>${gwizard.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.dropwizard</groupId>
+      <artifactId>dropwizard-jackson</artifactId>
+      <version>${dropwizard.version}</version>
     </dependency>
 
     <dependency>
@@ -54,7 +74,7 @@
       <artifactId>jackson-datatype-jsr310</artifactId>
       <version>2.6.4</version>
     </dependency>
-    
+
     <dependency>
       <groupId>org.apache.kafka</groupId>
       <artifactId>kafka-clients</artifactId>
@@ -109,18 +129,7 @@
           <target>1.8</target>
         </configuration>
       </plugin>
-
-      <plugin>
-        <groupId>org.mortbay.jetty</groupId>
-        <artifactId>jetty-maven-plugin</artifactId>
-        <version>${jettyVersion}</version>
-        <configuration>
-          <webApp>
-            <contextPath>/</contextPath>
-          </webApp>
-        </configuration>
-      </plugin>
-
+      
     </plugins>
   </build>
 

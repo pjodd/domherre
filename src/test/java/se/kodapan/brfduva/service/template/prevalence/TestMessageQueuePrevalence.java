@@ -4,12 +4,16 @@ import com.google.inject.Binder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.TypeLiteral;
+import com.google.inject.name.Names;
 import junit.framework.Assert;
 import lombok.Data;
 import org.junit.Test;
 import se.kodapan.brfduva.service.template.ServiceModule;
+import se.kodapan.brfduva.service.template.mq.MessageQueueFactory;
 import se.kodapan.brfduva.service.template.mq.MessageQueueReader;
 import se.kodapan.brfduva.service.template.mq.MessageQueueWriter;
+import se.kodapan.brfduva.service.template.mq.kafka.KafkaFactory;
+import se.kodapan.brfduva.service.template.mq.test.TestQueueFactory;
 import se.kodapan.brfduva.service.template.mq.test.TestQueueReader;
 import se.kodapan.brfduva.service.template.mq.test.TestQueueWriter;
 
@@ -19,7 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author kalle
  * @since 2017-02-17 15:45
  */
-public class TestPrevalence {
+public class TestMessageQueuePrevalence {
 
   @Test
   public void test() throws Exception {
@@ -28,16 +32,15 @@ public class TestPrevalence {
 
       @Override
       public void configure(Binder binder) {
-        binder.bind(MessageQueueWriter.class).to(TestQueueWriter.class);
-        binder.bind(MessageQueueReader.class).to(TestQueueReader.class);
-        binder.bind(Prevalence.class).to(new TypeLiteral<Prevalence<Root>>(){});
+        binder.bind(MessageQueueFactory.class).annotatedWith(Names.named("prevalence journal factory")).to(TestQueueFactory.class);
       }
 
     });
 
-    Prevalence<Root> prevalence = injector.getInstance(Prevalence.class);
-    MessageQueuePrevalence<Root> messageQueuePrevalence = injector.getInstance(MessageQueuePrevalence.class);
+    Prevalence prevalence = injector.getInstance(Prevalence.class);
+    MessageQueuePrevalence messageQueuePrevalence = injector.getInstance(MessageQueuePrevalence.class);
     Assert.assertTrue(messageQueuePrevalence.open());
+
     Assert.assertEquals(2, messageQueuePrevalence.execute(TestTransaction.class, new Payload(2)).getSum());
     Assert.assertEquals(3, messageQueuePrevalence.execute(TestTransaction.class, new Payload(1)).getSum());
     

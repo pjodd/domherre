@@ -37,10 +37,8 @@ public class KafkaReader extends AbstractMessageQueueReader {
     return Collections.EMPTY_MAP;
   }
 
-  @Override
-  public void registerConsumer(MessageQueueTopic topic, MessageQueueConsumer consumer) {
-    super.registerConsumer(topic, consumer);
-    kafkaConsumer.subscribe(Collections.singletonList(topic.toString()));
+  public KafkaReader(MessageQueueTopic topic, MessageQueueConsumer consumer) {
+    super(topic, consumer);
   }
 
   @Override
@@ -56,6 +54,7 @@ public class KafkaReader extends AbstractMessageQueueReader {
     config.putAll(getAdditionalKafkaProperties());
 
     kafkaConsumer = new KafkaConsumer<>(config);
+    kafkaConsumer.subscribe(Collections.singletonList(getTopic().toString()));
 
     log.trace("Opened Kafka kafkaConsumer using config " + config);
 
@@ -64,6 +63,7 @@ public class KafkaReader extends AbstractMessageQueueReader {
     pollerThread.setDaemon(true);
     pollerThread.setName("Kafka poller thread");
     pollerThread.start();
+
 
     return true;
   }

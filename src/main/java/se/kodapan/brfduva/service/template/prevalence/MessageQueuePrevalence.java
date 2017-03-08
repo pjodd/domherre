@@ -20,7 +20,7 @@ import java.util.concurrent.TimeoutException;
  * @author kalle
  * @since 2017-02-12 22:13
  */
-public class MessageQueuePrevalence<Root> implements Initializable {
+public class MessageQueuePrevalence implements Initializable {
 
   private Logger log = LoggerFactory.getLogger(getClass());
 
@@ -28,9 +28,11 @@ public class MessageQueuePrevalence<Root> implements Initializable {
   private Prevalence prevalence;
 
   @Inject
+  @Named("prevalence journal factory")
+  private MessageQueueFactory journalFactory;
+
   private MessageQueueReader journalReader;
 
-  @Inject
   private MessageQueueWriter journalWriter;
 
   @Inject
@@ -77,7 +79,7 @@ public class MessageQueuePrevalence<Root> implements Initializable {
     }
     log.info("Bound " + eventSourceBindings.size() + " transaction classes in classpath.");
 
-    journalReader.registerConsumer(eventSourceTopic, new MessageQueueConsumer() {
+    journalReader = journalFactory.readerFactory(eventSourceTopic, new MessageQueueConsumer() {
       @Override
       public void consume(MessageQueueMessage message) {
 
@@ -130,6 +132,12 @@ public class MessageQueuePrevalence<Root> implements Initializable {
       return false;
     }
 
+    journalWriter = journalFactory.writerFactory();
+    if (!journalWriter.open()) {
+      log.error("Unable to open journal writer");
+      return false;
+    }
+
     return true;
   }
 
@@ -155,13 +163,13 @@ public class MessageQueuePrevalence<Root> implements Initializable {
   private TimeUnit defaultExecuteTimeoutUnit = TimeUnit.MINUTES;
   private long defaultExecuteTimeoutAmount = 1;
 
-  public <Response, Payload> Response execute(
+  public <Response, Payload, Root> Response execute(
       Class<? extends Transaction<Root, Payload, Response>> transactionClass,
       Payload payload) throws Exception {
     return execute(transactionClass, payload, defaultExecuteTimeoutUnit, defaultExecuteTimeoutAmount);
   }
 
-  public <Response, Payload> Response execute(
+  public <Response, Payload, Root> Response execute(
       Class<? extends Transaction<Root, Payload, Response>> transactionClass,
       Payload payload,
       TimeUnit timeoutUnit,
@@ -210,7 +218,7 @@ public class MessageQueuePrevalence<Root> implements Initializable {
    * @param <PayloadClass>
    * @throws IllegalStateException If stereotype and version is already bound.
    */
-  public synchronized <PayloadClass> void registerEventSourceBinding(
+  public synchronized <PayloadClass, Root> void registerEventSourceBinding(
       String stereotype,
       int version,
       Class<PayloadClass> payloadClass,
@@ -259,13 +267,13 @@ public class MessageQueuePrevalence<Root> implements Initializable {
     private int version;
 
     private Class payloadClass;
-    private Class<? extends Transaction<Root, ? extends Object, ? extends Object>> transactionClass;
+    private Class<? extends Transaction<? extends Object, ? extends Object, ? extends Object>> transactionClass;
 
     public EventSourceBinding(
         String stereotype,
         int version,
         Class payloadClass,
-        Class<? extends Transaction<Root, ? extends Object, ? extends Object>> transactionClass
+        Class<? extends Transaction<? extends Object, ? extends Object, ? extends Object>> transactionClass
     ) {
       this.stereotype = stereotype;
       this.version = version;

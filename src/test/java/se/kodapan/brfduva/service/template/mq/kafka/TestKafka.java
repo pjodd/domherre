@@ -2,9 +2,7 @@ package se.kodapan.brfduva.service.template.mq.kafka;
 
 import org.junit.Assert;
 import org.junit.Test;
-import se.kodapan.brfduva.service.template.mq.MessageQueueConsumer;
-import se.kodapan.brfduva.service.template.mq.MessageQueueMessage;
-import se.kodapan.brfduva.service.template.mq.MessageQueueTopic;
+import se.kodapan.brfduva.service.template.mq.*;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -26,25 +24,24 @@ public class TestKafka {
     System.out.println("Using seed " + seed);
     Random random = new Random(seed);
 
-
     ConcurrentLinkedQueue<MessageQueueMessage> writtenMessages = new ConcurrentLinkedQueue<>();
 
     MessageQueueTopic topic = new MessageQueueTopic("test-" + System.currentTimeMillis(), "test");
 
-    KafkaReader reader = new KafkaReader();
-    Assert.assertTrue(reader.open());
+    KafkaFactory factory = new KafkaFactory();
 
     final List<MessageQueueMessage> consumed = new ArrayList<>();
-    reader.registerConsumer(topic, new MessageQueueConsumer() {
+
+    MessageQueueReader reader = factory.readerFactory(topic, new MessageQueueConsumer() {
       @Override
       public void consume(MessageQueueMessage message) {
         Assert.assertEquals(writtenMessages.poll(), message);
         consumed.add(message);
       }
     });
+    Assert.assertTrue(reader.open());
 
-
-    KafkaWriter writer = new KafkaWriter();
+    MessageQueueWriter writer = factory.writerFactory();
     Assert.assertTrue(writer.open());
 
     for (int i = 0; i < 100; i++) {

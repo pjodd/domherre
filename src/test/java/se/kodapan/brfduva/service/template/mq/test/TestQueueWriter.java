@@ -13,12 +13,10 @@ import se.kodapan.brfduva.service.template.mq.MessageQueueWriter;
  */
 public class TestQueueWriter implements MessageQueueWriter {
 
-  @Inject
-  @Getter
-  @Setter
   private TestQueue testQueue;
 
-  public TestQueueWriter() {
+  public TestQueueWriter(TestQueue testQueue) {
+    this.testQueue = testQueue;
   }
 
   @Override

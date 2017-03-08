@@ -9,7 +9,10 @@ import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.Provides;
 import com.google.inject.name.Named;
+import com.google.inject.name.Names;
+import se.kodapan.brfduva.service.template.mq.MessageQueueFactory;
 import se.kodapan.brfduva.service.template.mq.MessageQueueTopic;
+import se.kodapan.brfduva.service.template.mq.kafka.KafkaFactory;
 
 import javax.inject.Singleton;
 
@@ -17,7 +20,7 @@ import javax.inject.Singleton;
  * @author kalle
  * @since 2017-02-15 02:28
  */
-public abstract class ServiceModule implements Module {
+public class ServiceModule implements Module {
 
   private String serviceName;
   private Class rootClass;
@@ -29,14 +32,13 @@ public abstract class ServiceModule implements Module {
 
   @Override
   public void configure(Binder binder) {
-
+    binder.bind(MessageQueueFactory.class).annotatedWith(Names.named("prevalence journal factory")).to(KafkaFactory.class);
   }
 
   @Provides
-  @Named("root")
+  @Named("prevalence root")
   public Object rootFactory() throws Exception {
     return rootClass.newInstance();
-
   }
 
   @Provides

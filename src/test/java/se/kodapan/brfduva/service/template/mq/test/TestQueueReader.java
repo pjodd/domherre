@@ -6,7 +6,9 @@ import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.kodapan.brfduva.service.template.mq.AbstractMessageQueueReader;
+import se.kodapan.brfduva.service.template.mq.MessageQueueConsumer;
 import se.kodapan.brfduva.service.template.mq.MessageQueueMessage;
+import se.kodapan.brfduva.service.template.mq.MessageQueueTopic;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -22,12 +24,14 @@ public class TestQueueReader extends AbstractMessageQueueReader {
 
   private Logger log = LoggerFactory.getLogger(getClass());
 
-  @Inject
-  @Setter
-  @Getter
   private TestQueue testQueue;
 
   private Poller poller;
+
+  public TestQueueReader(TestQueue testQueue, MessageQueueTopic topic, MessageQueueConsumer consumer) {
+    super(topic, consumer);
+    this.testQueue = testQueue;
+  }
 
   @Override
   public boolean open() throws Exception {

@@ -16,17 +16,17 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @author kalle
  * @since 2017-02-12 22:06
  */
-public class Prevalence<Root> {
+public class Prevalence {
 
   private Logger log = LoggerFactory.getLogger(getClass());
 
   private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
-  private Root root;
+  private Object root;
 
   @Inject
-  public Prevalence(@Named("root") Object root) {
-    this.root = (Root)root;
+  public Prevalence(@Named("prevalence root") Object root) {
+    this.root = root;
   }
 
   @Getter
@@ -37,14 +37,14 @@ public class Prevalence<Root> {
   @Setter
   private TimeUnit defaultLockTimemoutUnit = TimeUnit.MINUTES;
 
-  public <Response> Response execute(Query<Root, Response> query) throws Exception {
+  public <Response, Root> Response execute(Query<Root, Response> query) throws Exception {
     return execute(query, defaultLockTimeout, defaultLockTimemoutUnit);
   }
-  public <Response> Response execute(Query<Root, Response> query, long timeout, TimeUnit timeoutUnit) throws Exception {
+  public <Response, Root> Response execute(Query<Root, Response> query, long timeout, TimeUnit timeoutUnit) throws Exception {
     if (lock.readLock().tryLock(timeout, timeoutUnit)) {
       try {
         log.debug("Executing query " + query);
-        return query.execute(root, OffsetDateTime.now());
+        return query.execute((Root)root, OffsetDateTime.now());
       } finally {
         lock.readLock().unlock();
       }
@@ -53,11 +53,11 @@ public class Prevalence<Root> {
     }
   }
 
-  public <Response, Payload> Response execute(Transaction<Root, Payload, Response> transaction, Payload payload) throws Exception {
+  public <Response, Payload, Root> Response execute(Transaction<Root, Payload, Response> transaction, Payload payload) throws Exception {
     if (lock.writeLock().tryLock(defaultLockTimeout, defaultLockTimemoutUnit)) {
       try {
         log.debug("Executing transaction " + transaction.getClass().getName() + " using payload " + payload);
-        return transaction.execute(root, payload);
+        return transaction.execute((Root)root, payload);
       } finally {
         lock.writeLock().unlock();
       }

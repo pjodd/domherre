@@ -2,9 +2,7 @@ package se.kodapan.brfduva.service.template.mq.test;
 
 import org.junit.Assert;
 import org.junit.Test;
-import se.kodapan.brfduva.service.template.mq.MessageQueueConsumer;
-import se.kodapan.brfduva.service.template.mq.MessageQueueMessage;
-import se.kodapan.brfduva.service.template.mq.MessageQueueTopic;
+import se.kodapan.brfduva.service.template.mq.*;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -32,24 +30,19 @@ public class TestTestQueue {
 
     MessageQueueTopic topic = new MessageQueueTopic("test-" + System.currentTimeMillis(), "test");
 
-    TestQueue testQueue = new TestQueue();
-
-    TestQueueReader reader = new TestQueueReader();
-    reader.setTestQueue(testQueue);
-    Assert.assertTrue(reader.open());
+    TestQueueFactory factory= new TestQueueFactory();
 
     final List<MessageQueueMessage> consumed = new ArrayList<>();
-    reader.registerConsumer(topic, new MessageQueueConsumer() {
+    MessageQueueReader reader = factory.readerFactory(topic, new MessageQueueConsumer() {
       @Override
       public void consume(MessageQueueMessage message) {
         Assert.assertEquals(writtenMessages.poll(), message);
         consumed.add(message);
       }
     });
+    Assert.assertTrue(reader.open());
 
-
-    TestQueueWriter writer = new TestQueueWriter();
-    writer.setTestQueue(testQueue);
+    MessageQueueWriter writer = factory.writerFactory();
     Assert.assertTrue(writer.open());
 
     for (int i = 0; i < 100; i++) {
