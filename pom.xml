@@ -129,7 +129,28 @@
           <target>1.8</target>
         </configuration>
       </plugin>
-      
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>1.2.1</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>java</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <mainClass>se.kodapan.service.template.Service</mainClass>
+          <!--<arguments>-->
+            <!--<argument>foo</argument>-->
+            <!--<argument>bar</argument>-->
+          <!--</arguments>-->
+        </configuration>
+      </plugin>
+
+
     </plugins>
   </build>
 

@@ -1,4 +1,4 @@
-package se.kodapan.service.template.mq.test;
+package se.kodapan.service.template.mq.ram;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,23 +16,23 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author kalle
  * @since 2017-02-15 08:45
  */
-public class TestQueueReader extends AbstractMessageQueueReader {
+public class RamQueueReader extends AbstractMessageQueueReader {
 
   private Logger log = LoggerFactory.getLogger(getClass());
 
-  private TestQueue testQueue;
+  private RamMessageQueue ramMessageQueue;
 
   private Poller poller;
 
-  public TestQueueReader(TestQueue testQueue, MessageQueueTopic topic, MessageQueueConsumer consumer) {
+  public RamQueueReader(RamMessageQueue ramMessageQueue, MessageQueueTopic topic, MessageQueueConsumer consumer) {
     super(topic, consumer);
-    this.testQueue = testQueue;
+    this.ramMessageQueue = ramMessageQueue;
   }
 
   @Override
   public boolean open() throws Exception {
 
-    log.info("Opening test queue reader");
+    log.info("Opening ram queue reader");
 
     poller = new Poller();
     Thread pollerThread = new Thread(poller);
@@ -78,7 +78,7 @@ public class TestQueueReader extends AbstractMessageQueueReader {
       try {
         while (!stopSignal.get()) {
           try {
-            ConcurrentLinkedQueue<MessageQueueMessage> queue = testQueue.getQueueByTopic(getTopic());
+            ConcurrentLinkedQueue<MessageQueueMessage> queue = ramMessageQueue.getQueueByTopic(getTopic());
             MessageQueueMessage message;
             while ((message = queue.poll()) != null) {
               try {

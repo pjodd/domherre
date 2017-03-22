@@ -26,7 +26,7 @@ public class TestKafka {
 
     ConcurrentLinkedQueue<MessageQueueMessage> writtenMessages = new ConcurrentLinkedQueue<>();
 
-    MessageQueueTopic topic = new MessageQueueTopic("test-" + System.currentTimeMillis(), "test");
+    MessageQueueTopic topic = new MessageQueueTopic("ram-" + System.currentTimeMillis(), "ram");
 
     KafkaFactory factory = new KafkaFactory();
 

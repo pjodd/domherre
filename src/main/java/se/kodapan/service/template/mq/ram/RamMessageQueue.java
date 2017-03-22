@@ -1,4 +1,4 @@
-package se.kodapan.service.template.mq.test;
+package se.kodapan.service.template.mq.ram;
 
 import com.google.inject.Singleton;
 import org.slf4j.Logger;
@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * @since 2017-02-15 08:45
  */
 @Singleton
-public class TestQueue {
+public class RamMessageQueue {
 
   private Logger log = LoggerFactory.getLogger(getClass());
 

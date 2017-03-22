@@ -9,7 +9,7 @@ import lombok.Data;
 import org.junit.Test;
 import se.kodapan.service.template.ServiceModule;
 import se.kodapan.service.template.mq.MessageQueueFactory;
-import se.kodapan.service.template.mq.test.TestQueueFactory;
+import se.kodapan.service.template.mq.ram.RamQueueFactory;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -22,11 +22,11 @@ public class TestMessageQueuePrevalence {
   @Test
   public void test() throws Exception {
 
-    Injector injector = Guice.createInjector(new ServiceModule("test", Root.class) {
+    Injector injector = Guice.createInjector(new ServiceModule("ram", Root.class) {
 
       @Override
       public void configure(Binder binder) {
-        binder.bind(MessageQueueFactory.class).annotatedWith(Names.named("prevalence journal factory")).to(TestQueueFactory.class);
+        binder.bind(MessageQueueFactory.class).annotatedWith(Names.named("prevalence journal factory")).to(RamQueueFactory.class);
       }
 
     });

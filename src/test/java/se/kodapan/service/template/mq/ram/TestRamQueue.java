@@ -1,4 +1,4 @@
-package se.kodapan.service.template.mq.test;
+package se.kodapan.service.template.mq.ram;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * @author kalle
  * @since 2017-02-15 09:01
  */
-public class TestTestQueue {
+public class TestRamQueue {
 
   @Test
   public void test() throws Exception {
@@ -27,9 +27,9 @@ public class TestTestQueue {
 
     ConcurrentLinkedQueue<MessageQueueMessage> writtenMessages = new ConcurrentLinkedQueue<>();
 
-    MessageQueueTopic topic = new MessageQueueTopic("test-" + System.currentTimeMillis(), "test");
+    MessageQueueTopic topic = new MessageQueueTopic("ram-" + System.currentTimeMillis(), "ram");
 
-    TestQueueFactory factory= new TestQueueFactory();
+    RamQueueFactory factory= new RamQueueFactory();
 
     final List<MessageQueueMessage> consumed = new ArrayList<>();
     MessageQueueReader reader = factory.readerFactory(topic, new MessageQueueConsumer() {

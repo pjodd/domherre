@@ -9,7 +9,7 @@ import org.junit.Test;
 import se.kodapan.service.template.Service;
 import se.kodapan.service.template.ServiceModule;
 import se.kodapan.service.template.mq.MessageQueueFactory;
-import se.kodapan.service.template.mq.test.TestQueueFactory;
+import se.kodapan.service.template.mq.ram.RamQueueFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,10 +23,10 @@ public class TestService {
   @Test
   public void test() throws Exception {
 
-    ServiceModule serviceModule = new ServiceModule("test", Root.class) {
+    ServiceModule serviceModule = new ServiceModule("ram", Root.class) {
       @Override
       public void configure(Binder binder) {
-        binder.bind(MessageQueueFactory.class).annotatedWith(Names.named("prevalence journal factory")).to(TestQueueFactory.class);
+        binder.bind(MessageQueueFactory.class).annotatedWith(Names.named("prevalence journal factory")).to(RamQueueFactory.class);
       }
     };
 
@@ -48,9 +48,9 @@ public class TestService {
       System.currentTimeMillis();
 
       service.run();
-      while (true) {
-        Thread.sleep(1000);
-      }
+//      while (true) {
+//        Thread.sleep(1000);
+//      }
 
     } finally {
       Assert.assertTrue(service.close());
