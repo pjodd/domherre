@@ -142,7 +142,7 @@
           </execution>
         </executions>
         <configuration>
-          <mainClass>se.kodapan.service.template.Service</mainClass>
+          <mainClass>se.kodapan.service.template.Main</mainClass>
           <!--<arguments>-->
             <!--<argument>foo</argument>-->
             <!--<argument>bar</argument>-->

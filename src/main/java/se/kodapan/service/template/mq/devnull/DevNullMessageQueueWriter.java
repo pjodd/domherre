@@ -5,7 +5,8 @@ import se.kodapan.service.template.mq.MessageQueueTopic;
 import se.kodapan.service.template.mq.MessageQueueWriter;
 
 /**
- * Created by kalle on 2017-03-22.
+ * @author kalle
+ * @since 2017-03-22
  */
 public class DevNullMessageQueueWriter implements MessageQueueWriter {
 

@@ -3,7 +3,8 @@ package se.kodapan.service.template.mq.devnull;
 import se.kodapan.service.template.mq.*;
 
 /**
- * Created by kalle on 2017-03-22.
+ * @author kalle
+ * @since 2017-03-22
  */
 public class DevNullMessageQueueFactory implements MessageQueueFactory {
 
