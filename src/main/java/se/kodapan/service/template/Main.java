@@ -72,6 +72,8 @@ public class Main {
           }
         });
 
+        service.run();
+
         stopSignal.await();
 
       }
