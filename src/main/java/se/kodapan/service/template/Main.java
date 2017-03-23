@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * @author kalle
@@ -56,6 +57,8 @@ public class Main {
 
       Service service = serviceClasses.get(0).newInstance();
 
+      CountDownLatch stopSignal = new CountDownLatch(1);
+
       if (service.open()) {
         Runtime.getRuntime().addShutdownHook(new Thread() {
           public void run() {
@@ -63,9 +66,13 @@ public class Main {
               service.close();
             } catch (Exception e) {
               log.error("Exception while closing service", e);
+            } finally {
+              stopSignal.countDown();
             }
           }
         });
+
+        stopSignal.await();
 
       }
 
