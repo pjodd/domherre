@@ -27,7 +27,7 @@ public class TestRamQueue {
 
     ConcurrentLinkedQueue<MessageQueueMessage> writtenMessages = new ConcurrentLinkedQueue<>();
 
-    MessageQueueTopic topic = new MessageQueueTopic("ram-" + System.currentTimeMillis(), "ram");
+    MessageQueueTopic topic = new MessageQueueTopic("test-" + System.currentTimeMillis(), "test");
 
     RamQueueFactory factory= new RamQueueFactory();
 

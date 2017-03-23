@@ -2,6 +2,7 @@ package se.kodapan.service.template.mq.kafka;
 
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.slf4j.Logger;
@@ -14,6 +15,7 @@ import se.kodapan.service.template.util.Environment;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.Future;
 
 /**
  * @author kalle
@@ -69,7 +71,9 @@ public class KafkaWriter implements MessageQueueWriter {
   }
 
   public void write(MessageQueueTopic topic, String message) throws Exception {
-    kafkaProducer.send(new ProducerRecord<>(topic.toString(), message));
+    Future<RecordMetadata> future = kafkaProducer.send(new ProducerRecord<>(topic.toString(), message));
+    RecordMetadata recordMetadata = future.get();
+    System.currentTimeMillis();
   }
 
   public String getKafkaBootstrapList() {

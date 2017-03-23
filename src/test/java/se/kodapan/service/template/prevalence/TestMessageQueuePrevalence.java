@@ -22,7 +22,7 @@ public class TestMessageQueuePrevalence {
   @Test
   public void test() throws Exception {
 
-    Injector injector = Guice.createInjector(new ServiceModule("ram", Root.class) {
+    Injector injector = Guice.createInjector(new ServiceModule("test", Root.class) {
 
       @Override
       public void configure(Binder binder) {

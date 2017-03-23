@@ -1,6 +1,7 @@
 package se.kodapan.service.template.mq.kafka;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import se.kodapan.service.template.mq.*;
 
@@ -18,6 +19,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class TestKafka {
 
   @Test
+  @Ignore
   public void test() throws Exception {
 
     long seed = System.currentTimeMillis();
@@ -26,7 +28,7 @@ public class TestKafka {
 
     ConcurrentLinkedQueue<MessageQueueMessage> writtenMessages = new ConcurrentLinkedQueue<>();
 
-    MessageQueueTopic topic = new MessageQueueTopic("ram-" + System.currentTimeMillis(), "ram");
+    MessageQueueTopic topic = new MessageQueueTopic("test-" + System.currentTimeMillis(), "test");
 
     KafkaFactory factory = new KafkaFactory();
 
@@ -37,6 +39,7 @@ public class TestKafka {
       public void consume(MessageQueueMessage message) {
         Assert.assertEquals(writtenMessages.poll(), message);
         consumed.add(message);
+        System.out.println("in: " + message.toString());
       }
     });
     Assert.assertTrue(reader.open());
@@ -45,9 +48,10 @@ public class TestKafka {
     Assert.assertTrue(writer.open());
 
     for (int i = 0; i < 100; i++) {
-      System.out.println(i);
 
-      Thread.sleep(random.nextInt(100 * (random.nextInt(10) == 0 ? 20 : 1)));
+      int sleep = random.nextInt(100 * (random.nextInt(10) == 0 ? 20 : 1));
+      System.out.println("sleep: " + sleep);
+      Thread.sleep(sleep);
 
       MessageQueueMessage message = new MessageQueueMessage();
       message.setIdentity(UUID.randomUUID());
@@ -58,6 +62,9 @@ public class TestKafka {
 
       writtenMessages.add(message);
       writer.write(topic, message);
+
+      System.out.println("out: " + message.toString());
+
     }
 
     Thread.sleep(5000);
