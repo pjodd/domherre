@@ -3,7 +3,6 @@ package se.kodapan.service.template;
 import com.google.common.reflect.ClassPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import se.kodapan.service.template.prevalence.Transaction;
 
 import java.io.IOException;
 import java.util.ArrayList;
