@@ -1,21 +1,27 @@
 package se.kodapan.service.template.mq.localfs;
 
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import se.kodapan.service.template.Initializable;
 import se.kodapan.service.template.mq.*;
 
 import java.io.File;
 
 /**
- * Created by kalle on 2017-03-22.
+ * @author kalle
+ * @since 2017-03-24
  */
 public class LocalFsMessageQueueFactory implements MessageQueueFactory, Initializable {
+
+  @Inject
+  @Named("local fs message queue absolute root path")
+  private String absoluteRootPath;
 
   private LocalFsMessageQueue messageQueue;
 
   @Override
   public boolean open() throws Exception {
-    messageQueue = new LocalFsMessageQueue();
-    // todo
+    messageQueue = new LocalFsMessageQueue(new File(absoluteRootPath));
     return true;
   }
 
@@ -33,4 +39,10 @@ public class LocalFsMessageQueueFactory implements MessageQueueFactory, Initiali
   public MessageQueueWriter writerFactory() {
     return new LocalFsMessageQueueWriter(messageQueue);
   }
+
+  void setAbsoluteRootPath(String absoluteRootPath) {
+    this.absoluteRootPath = absoluteRootPath;
+  }
 }
+
+

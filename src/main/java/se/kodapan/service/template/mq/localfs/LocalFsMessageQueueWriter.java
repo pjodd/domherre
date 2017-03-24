@@ -5,7 +5,8 @@ import se.kodapan.service.template.mq.MessageQueueTopic;
 import se.kodapan.service.template.mq.MessageQueueWriter;
 
 /**
- * Created by kalle on 2017-03-22.
+ * @author kalle
+ * @since 2017-03-24
  */
 public class LocalFsMessageQueueWriter implements MessageQueueWriter {
 
@@ -27,6 +28,6 @@ public class LocalFsMessageQueueWriter implements MessageQueueWriter {
 
   @Override
   public void write(MessageQueueTopic topic, MessageQueueMessage message) throws Exception {
-    // todo
+    queue.getTopic(topic).write(message);
   }
 }

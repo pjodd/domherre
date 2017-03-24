@@ -16,6 +16,7 @@ import se.kodapan.service.template.mq.MessageQueueTopic;
 import se.kodapan.service.template.mq.kafka.KafkaFactory;
 
 import javax.inject.Singleton;
+import java.io.File;
 
 /**
  * @author kalle
@@ -53,6 +54,13 @@ public class ServiceModule implements Module {
   @Named("prevalence journal topic")
   public MessageQueueTopic prevalenceJournalTopicFactory() {
     return new MessageQueueTopic(serviceName, "prevalence-journal");
+  }
+
+  @Singleton
+  @Provides
+  @Named("local fs message queue absolute root path")
+  public String localFsMessageQueueAbsoluteRootPath() {
+    return new File("data/localfsmq").getAbsolutePath();
   }
 
   @Singleton

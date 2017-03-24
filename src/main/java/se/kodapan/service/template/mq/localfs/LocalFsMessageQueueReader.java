@@ -5,7 +5,8 @@ import se.kodapan.service.template.mq.MessageQueueReader;
 import se.kodapan.service.template.mq.MessageQueueTopic;
 
 /**
- * Created by kalle on 2017-03-22.
+ * @author kalle
+ * @since 2017-03-24
  */
 public class LocalFsMessageQueueReader implements MessageQueueReader {
 
@@ -21,11 +22,13 @@ public class LocalFsMessageQueueReader implements MessageQueueReader {
 
   @Override
   public boolean open() throws Exception {
+    queue.register(this);
     return true;
   }
 
   @Override
   public boolean close() throws Exception {
+    queue.unregister(this);
     return true;
   }
 

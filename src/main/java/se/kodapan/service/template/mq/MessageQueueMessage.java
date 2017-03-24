@@ -14,8 +14,8 @@ import java.util.UUID;
 @Data
 public class MessageQueueMessage {
 
-  public UUID identity;
-  public OffsetDateTime created;
+  public UUID identity = UUID.randomUUID();
+  public OffsetDateTime created = OffsetDateTime.now();
 
   public String stereotype;
   public int version;
