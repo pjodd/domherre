@@ -5,12 +5,14 @@ import com.google.inject.name.Named;
 import se.kodapan.service.template.Initializable;
 import se.kodapan.service.template.mq.*;
 
+import javax.inject.Singleton;
 import java.io.File;
 
 /**
  * @author kalle
  * @since 2017-03-24
  */
+@Singleton
 public class LocalFsMessageQueueFactory implements MessageQueueFactory, Initializable {
 
   @Inject
