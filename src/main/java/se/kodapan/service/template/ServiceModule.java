@@ -63,11 +63,15 @@ public class ServiceModule implements Module {
     return new File("data/localfsmq").getAbsolutePath();
   }
 
+  public int getServerPort() {
+    return 8080;
+  }
+
   @Singleton
   @Provides
   public WebConfig webConfigFactory(){
     WebConfig webConfig = new WebConfig();
-    webConfig.setPort(8080);
+    webConfig.setPort(getServerPort());
     return webConfig;
   }
 
