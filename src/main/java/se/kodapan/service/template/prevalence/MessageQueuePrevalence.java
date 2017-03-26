@@ -3,6 +3,7 @@ package se.kodapan.service.template.prevalence;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.reflect.ClassPath;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.Data;
 import org.slf4j.Logger;
@@ -20,6 +21,7 @@ import java.util.concurrent.TimeoutException;
  * @author kalle
  * @since 2017-02-12 22:13
  */
+@Singleton
 public class MessageQueuePrevalence implements Initializable {
 
   private Logger log = LoggerFactory.getLogger(getClass());

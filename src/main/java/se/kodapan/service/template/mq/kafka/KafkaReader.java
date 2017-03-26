@@ -49,6 +49,7 @@ public class KafkaReader extends AbstractMessageQueueReader {
     config.put("bootstrap.servers", getKafkaBootstrapList());
     config.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
     config.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+    config.put("auto.offset.reset", "earliest");
     config.put("group.id", UUID.randomUUID().toString());
 
     config.putAll(getAdditionalKafkaProperties());
