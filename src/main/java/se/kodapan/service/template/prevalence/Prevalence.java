@@ -53,11 +53,11 @@ public class Prevalence {
     }
   }
 
-  public <Response, Payload, Root> Response execute(Transaction<Root, Payload, Response> transaction, Payload payload) throws Exception {
+  public <Response, Payload, Root> Response execute(Transaction<Root, Payload, Response> transaction, Payload payload, OffsetDateTime created) throws Exception {
     if (lock.writeLock().tryLock(defaultLockTimeout, defaultLockTimemoutUnit)) {
       try {
         log.debug("Executing transaction " + transaction.getClass().getName() + " using payload " + payload);
-        return transaction.execute((Root)root, payload);
+        return transaction.execute((Root)root, payload, created);
       } finally {
         lock.writeLock().unlock();
       }

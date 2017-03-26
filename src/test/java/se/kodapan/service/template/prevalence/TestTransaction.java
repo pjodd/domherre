@@ -1,5 +1,7 @@
 package se.kodapan.service.template.prevalence;
 
+import java.time.OffsetDateTime;
+
 /**
  * Created by kalle on 2017-03-22.
  */
@@ -25,7 +27,7 @@ public class TestTransaction implements Transaction<TestMessageQueuePrevalence.R
   }
 
   @Override
-  public TestMessageQueuePrevalence.Response execute(TestMessageQueuePrevalence.Root root, TestMessageQueuePrevalence.Payload payload) throws Exception {
+  public TestMessageQueuePrevalence.Response execute(TestMessageQueuePrevalence.Root root, TestMessageQueuePrevalence.Payload payload, OffsetDateTime created) throws Exception {
     TestMessageQueuePrevalence.Response response = new TestMessageQueuePrevalence.Response();
     response.setSum(root.getCounter().addAndGet(payload.getIncrement()));
     return response;

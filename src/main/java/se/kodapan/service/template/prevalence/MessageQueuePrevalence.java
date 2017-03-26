@@ -107,7 +107,7 @@ public class MessageQueuePrevalence implements Initializable {
               return;
             }
             try {
-              Object response = prevalence.execute(transaction, payload);
+              Object response = prevalence.execute(transaction, payload, message.getCreated());
               if (awaitedTransactionExecution != null) {
                 awaitedTransactionExecution.setTransactionResponse(response);
                 awaitedTransactionExecution.setExecuted(OffsetDateTime.now());
