@@ -39,10 +39,9 @@ public class TestService {
       }
 
     };
-    
+
     Assert.assertTrue(service.open());
     try {
-
 
 
       System.currentTimeMillis();

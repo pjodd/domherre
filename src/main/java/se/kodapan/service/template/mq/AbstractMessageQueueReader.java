@@ -23,5 +23,5 @@ public abstract class AbstractMessageQueueReader implements MessageQueueReader {
     this.consumer = consumer;
     this.objectMapper = objectMapper;
   }
-  
+
 }

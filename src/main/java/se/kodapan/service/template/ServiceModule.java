@@ -42,7 +42,7 @@ public class ServiceModule implements Module {
 
   @Singleton
   @Provides
-  public WebConfig webConfigFactory(){
+  public WebConfig webConfigFactory() {
     WebConfig webConfig = new WebConfig();
     webConfig.setPort(getServerPort());
     return webConfig;
@@ -58,5 +58,5 @@ public class ServiceModule implements Module {
     mapper.registerModule(new JavaTimeModule());
     return mapper;
   }
-  
+
 }

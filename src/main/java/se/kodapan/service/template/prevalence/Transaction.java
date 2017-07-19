@@ -9,12 +9,14 @@ import java.time.OffsetDateTime;
 public interface Transaction<Root, Payload, Response> {
 
   public abstract String getStereotype();
+
   public abstract Integer getVersion();
+
   public abstract Class<Payload> getPayloadClass();
+
   public abstract Class<Response> getResponseClass();
 
   /**
-   *
    * @param root
    * @param payload
    * @param created original transaction creation time

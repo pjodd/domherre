@@ -40,11 +40,12 @@ public class Prevalence {
   public <Response, Root> Response execute(Query<Root, Response> query) throws Exception {
     return execute(query, defaultLockTimeout, defaultLockTimemoutUnit);
   }
+
   public <Response, Root> Response execute(Query<Root, Response> query, long timeout, TimeUnit timeoutUnit) throws Exception {
     if (lock.readLock().tryLock(timeout, timeoutUnit)) {
       try {
         log.debug("Executing query " + query);
-        return query.execute((Root)root, OffsetDateTime.now());
+        return query.execute((Root) root, OffsetDateTime.now());
       } finally {
         lock.readLock().unlock();
       }
@@ -57,7 +58,7 @@ public class Prevalence {
     if (lock.writeLock().tryLock(defaultLockTimeout, defaultLockTimemoutUnit)) {
       try {
         log.debug("Executing transaction " + transaction.getClass().getName() + " using payload " + payload);
-        return transaction.execute((Root)root, payload, created);
+        return transaction.execute((Root) root, payload, created);
       } finally {
         lock.writeLock().unlock();
       }

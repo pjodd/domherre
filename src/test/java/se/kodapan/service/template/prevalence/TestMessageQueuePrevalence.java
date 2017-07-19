@@ -41,9 +41,8 @@ public class TestMessageQueuePrevalence {
 
     Assert.assertEquals(2, messageQueuePrevalence.execute(TestTransaction.class, new Payload(2)).getSum());
     Assert.assertEquals(3, messageQueuePrevalence.execute(TestTransaction.class, new Payload(1)).getSum());
-    
-    System.currentTimeMillis();
 
+    System.currentTimeMillis();
 
 
   }

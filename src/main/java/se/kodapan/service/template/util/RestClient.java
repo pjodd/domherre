@@ -47,7 +47,7 @@ public class RestClient {
     return processResponse(client.execute(new HttpDelete(url)), responseClass);
   }
 
-  protected  <ResponseClass> ResponseClass get(String url, Class<ResponseClass> responseClass) throws IOException {
+  protected <ResponseClass> ResponseClass get(String url, Class<ResponseClass> responseClass) throws IOException {
     return processResponse(client.execute(new HttpGet(url)), responseClass);
   }
 
@@ -62,8 +62,6 @@ public class RestClient {
       response.close();
     }
   }
-
-
 
 
 }

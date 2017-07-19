@@ -11,7 +11,9 @@ public class MessageQueueTopic {
 
   private String name;
 
-  /** event-source, command, etc */
+  /**
+   * event-source, command, etc
+   */
   private String stereotype;
 
   public MessageQueueTopic(String name, String stereotype) {

@@ -7,6 +7,7 @@ package se.kodapan.service.template.mq;
 public interface MessageQueueFactory {
 
   public abstract MessageQueueReader readerFactory(MessageQueueTopic topic, MessageQueueConsumer consumer);
+
   public abstract MessageQueueWriter writerFactory();
 
 }

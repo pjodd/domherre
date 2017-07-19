@@ -7,6 +7,7 @@ package se.kodapan.service.template;
 public interface Initializable {
 
   public abstract boolean open() throws Exception;
+
   public abstract boolean close() throws Exception;
 
 }

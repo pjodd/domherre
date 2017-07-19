@@ -33,7 +33,7 @@ public class TestRamQueue {
 
     MessageQueueTopic topic = new MessageQueueTopic("test-" + System.currentTimeMillis(), "test");
 
-    RamQueueFactory factory= new RamQueueFactory();
+    RamQueueFactory factory = new RamQueueFactory();
 
     final List<MessageQueueMessage> consumed = new ArrayList<>();
     MessageQueueReader reader = factory.readerFactory(topic, new MessageQueueConsumer() {
