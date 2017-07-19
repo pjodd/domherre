@@ -12,16 +12,23 @@ import se.kodapan.service.template.mq.kafka.KafkaFactory;
 
 import javax.inject.Singleton;
 
+import static se.kodapan.service.template.ServiceModule.SERVICE_NAME;
+
 /**
  * @author kalle
  * @since 2017-07-19
  */
 public class PrevalenceModule implements Module {
 
+  public static final String PREVALENCE_ROOT = "prevalence root";
+
+  public static final String PREVALENCE_JOURNAL_FACTORY = "prevalence journal factory";
+  public static final String PREVALENCE_JOURNAL_TOPIC = "prevalence journal topic";
+
   private Class rootClass;
 
   @Inject
-  @Named("service name")
+  @Named(SERVICE_NAME)
   private String serviceName;
 
   public PrevalenceModule(Class rootClass) {
@@ -30,18 +37,18 @@ public class PrevalenceModule implements Module {
 
   @Override
   public void configure(Binder binder) {
-    binder.bind(MessageQueueFactory.class).annotatedWith(Names.named("prevalence journal factory")).to(KafkaFactory.class);
+    binder.bind(MessageQueueFactory.class).annotatedWith(Names.named(PREVALENCE_JOURNAL_FACTORY)).to(KafkaFactory.class);
   }
 
   @Provides
-  @Named("prevalence root")
+  @Named(PREVALENCE_ROOT)
   public Object rootFactory() throws Exception {
     return rootClass.newInstance();
   }
 
   @Singleton
   @Provides
-  @Named("prevalence journal topic")
+  @Named(PREVALENCE_JOURNAL_TOPIC)
   public MessageQueueTopic prevalenceJournalTopicFactory() {
     return new MessageQueueTopic(serviceName, "prevalence-journal");
   }

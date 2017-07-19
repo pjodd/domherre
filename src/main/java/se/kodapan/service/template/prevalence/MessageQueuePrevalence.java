@@ -29,7 +29,7 @@ public class MessageQueuePrevalence implements Initializable {
   private Prevalence prevalence;
 
   @Inject
-  @Named("prevalence journal factory")
+  @Named(PrevalenceModule.PREVALENCE_JOURNAL_FACTORY)
   private MessageQueueFactory journalFactory;
 
   private MessageQueueReader journalReader;
@@ -37,7 +37,7 @@ public class MessageQueuePrevalence implements Initializable {
   private MessageQueueWriter journalWriter;
 
   @Inject
-  @Named("prevalence journal topic")
+  @Named(PrevalenceModule.PREVALENCE_JOURNAL_TOPIC)
   private MessageQueueTopic eventSourceTopic;
 
   @Inject

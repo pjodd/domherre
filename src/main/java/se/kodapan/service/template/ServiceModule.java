@@ -19,6 +19,8 @@ import javax.inject.Singleton;
  */
 public class ServiceModule implements Module {
 
+  public static final String SERVICE_NAME = "service name";
+
   private String serviceName;
 
   public ServiceModule(String serviceName) {
@@ -30,7 +32,7 @@ public class ServiceModule implements Module {
   }
 
   @Provides
-  @Named("service name")
+  @Named(SERVICE_NAME)
   public String serviceNameFactory() {
     return serviceName;
   }

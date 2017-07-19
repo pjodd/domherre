@@ -25,7 +25,7 @@ public class Prevalence {
   private Object root;
 
   @Inject
-  public Prevalence(@Named("prevalence root") Object root) {
+  public Prevalence(@Named(PrevalenceModule.PREVALENCE_ROOT) Object root) {
     this.root = root;
   }
 

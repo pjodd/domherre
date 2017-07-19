@@ -30,7 +30,7 @@ public class TestMessageQueuePrevalence {
     modules.add(new PrevalenceModule(Root.class) {
       @Override
       public void configure(Binder binder) {
-        binder.bind(MessageQueueFactory.class).annotatedWith(Names.named("prevalence journal factory")).to(RamQueueFactory.class);
+        binder.bind(MessageQueueFactory.class).annotatedWith(Names.named(PrevalenceModule.PREVALENCE_JOURNAL_FACTORY)).to(RamQueueFactory.class);
       }
     });
     Injector injector = Guice.createInjector(modules);
