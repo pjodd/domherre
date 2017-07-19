@@ -1,6 +1,8 @@
 package se.kodapan.service.template;
 
-import com.google.inject.*;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Module;
 import org.gwizard.services.Run;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

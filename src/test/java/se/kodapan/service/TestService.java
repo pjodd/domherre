@@ -1,8 +1,6 @@
 package se.kodapan.service;
 
 import com.google.inject.Binder;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.name.Names;
 import junit.framework.Assert;
@@ -13,7 +11,6 @@ import se.kodapan.service.template.ServiceModule;
 import se.kodapan.service.template.mq.MessageQueueFactory;
 import se.kodapan.service.template.mq.ram.RamQueueFactory;
 import se.kodapan.service.template.prevalence.PrevalenceModule;
-import se.kodapan.service.template.prevalence.TestMessageQueuePrevalence;
 
 import java.util.ArrayList;
 import java.util.List;

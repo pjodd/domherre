@@ -6,7 +6,8 @@ import org.slf4j.LoggerFactory;
 import se.kodapan.service.template.mq.MessageQueueMessage;
 import se.kodapan.service.template.mq.MessageQueueTopic;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**

@@ -9,7 +9,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 
-import javax.xml.ws.Response;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 

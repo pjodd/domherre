@@ -5,7 +5,6 @@ import com.google.inject.Module;
 import com.google.inject.Provides;
 import com.google.inject.name.Named;
 
-import javax.inject.Singleton;
 import java.io.File;
 
 /**

@@ -2,21 +2,14 @@ package se.kodapan.service.template.mq.localfs;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.inject.Binder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
-import com.google.inject.name.Names;
 import junit.framework.Assert;
 import org.junit.Test;
-import se.kodapan.service.TestService;
 import se.kodapan.service.template.ServiceModule;
 import se.kodapan.service.template.mq.*;
-import se.kodapan.service.template.mq.ram.RamQueueFactory;
-import se.kodapan.service.template.prevalence.PrevalenceModule;
-import se.kodapan.service.template.prevalence.TestMessageQueuePrevalence;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 

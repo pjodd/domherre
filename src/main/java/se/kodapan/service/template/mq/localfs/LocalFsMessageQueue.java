@@ -2,12 +2,12 @@ package se.kodapan.service.template.mq.localfs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
-import se.kodapan.service.template.mq.MessageQueueMessage;
 import se.kodapan.service.template.mq.MessageQueueTopic;
 
-import java.io.*;
-import java.time.OffsetDateTime;
-import java.util.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author kalle

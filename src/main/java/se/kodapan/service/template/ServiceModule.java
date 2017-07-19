@@ -9,14 +9,9 @@ import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.Provides;
 import com.google.inject.name.Named;
-import com.google.inject.name.Names;
 import org.gwizard.web.WebConfig;
-import se.kodapan.service.template.mq.MessageQueueFactory;
-import se.kodapan.service.template.mq.MessageQueueTopic;
-import se.kodapan.service.template.mq.kafka.KafkaFactory;
 
 import javax.inject.Singleton;
-import java.io.File;
 
 /**
  * @author kalle
