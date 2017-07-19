@@ -39,8 +39,8 @@ public class TestMessageQueuePrevalence {
     MessageQueuePrevalence messageQueuePrevalence = injector.getInstance(MessageQueuePrevalence.class);
     Assert.assertTrue(messageQueuePrevalence.open());
 
-    Assert.assertEquals(2, messageQueuePrevalence.execute(TestTransaction.class, new Payload(2)).getSum());
-    Assert.assertEquals(3, messageQueuePrevalence.execute(TestTransaction.class, new Payload(1)).getSum());
+    Assert.assertEquals(2, messageQueuePrevalence.execute(TestTransaction.class, new Payload(2)).get().getSum());
+    Assert.assertEquals(3, messageQueuePrevalence.execute(TestTransaction.class, new Payload(1)).get().getSum());
 
     System.currentTimeMillis();
 

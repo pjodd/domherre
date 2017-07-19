@@ -14,9 +14,7 @@ import se.kodapan.service.template.mq.*;
 
 import java.time.OffsetDateTime;
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 
 /**
  * @author kalle
@@ -152,6 +150,34 @@ public class MessageQueuePrevalence implements Initializable {
     return true;
   }
 
+  /**
+   * Sending transaction to journal and does not wait for execution.
+   *
+   * @param transactionClass
+   * @param payload
+   * @param <Response>
+   * @param <Payload>
+   * @param <Root>
+   * @throws Exception
+   */
+  public <Response, Payload, Root> void send(
+      Class<? extends Transaction<Root, Payload, Response>> transactionClass,
+      Payload payload
+  ) throws Exception {
+
+    log.debug("Executing {} using payload {}", transactionClass.getName(), payload);
+
+    EventSourceBinding eventSourceBinding = findBinding(transactionClass);
+    if (eventSourceBinding == null) {
+      throw new IllegalStateException("No binding for " + transactionClass.getName());
+    }
+
+    MessageQueueMessage message = messageFactory(payload, eventSourceBinding);
+
+    journalWriter.write(eventSourceTopic, message);
+  }
+
+
 
   @Data
   private static class AwaitedTransactionExecution {
@@ -166,32 +192,33 @@ public class MessageQueuePrevalence implements Initializable {
   private TimeUnit defaultExecuteTimeoutUnit = TimeUnit.MINUTES;
   private long defaultExecuteTimeoutAmount = 1;
 
-  public <Response, Payload, Root> Response execute(
-      Class<? extends Transaction<Root, Payload, Response>> transactionClass,
-      Payload payload) throws Exception {
-    return execute(transactionClass, payload, defaultExecuteTimeoutUnit, defaultExecuteTimeoutAmount);
-  }
 
-  public <Response, Payload, Root> Response execute(
+  /**
+   * Executes and waits for response using a future.
+   *
+   * If you don't care about the response use {@link #send(Class, Object)} instead to save system resources.
+   *
+   * @param transactionClass
+   * @param payload
+   * @param <Response>
+   * @param <Payload>
+   * @param <Root>
+   * @return
+   * @throws Exception
+   */
+  public <Response, Payload, Root> Future<Response> execute(
       Class<? extends Transaction<Root, Payload, Response>> transactionClass,
-      Payload payload,
-      TimeUnit timeoutUnit,
-      long timeoutAmount
+      Payload payload
   ) throws Exception {
 
-    log.debug("Executing " + transactionClass.getName() + " using payload " + payload);
+    log.debug("Executing {} using payload {}", transactionClass.getName(), payload);
 
     EventSourceBinding eventSourceBinding = findBinding(transactionClass);
     if (eventSourceBinding == null) {
       throw new IllegalStateException("No binding for " + transactionClass.getName());
     }
 
-    MessageQueueMessage message = new MessageQueueMessage();
-    message.setIdentity(UUID.randomUUID());
-    message.setCreated(OffsetDateTime.now());
-    message.setPayload(objectMapper.readValue(objectMapper.writeValueAsString(payload), JsonNode.class));
-    message.setStereotype(eventSourceBinding.getStereotype());
-    message.setVersion(eventSourceBinding.getVersion());
+    MessageQueueMessage message = messageFactory(payload, eventSourceBinding);
 
     AwaitedTransactionExecution awaitedTransactionExecution = new AwaitedTransactionExecution();
     awaitedTransactionExecution.setMessageIdentity(message.getIdentity());
@@ -202,14 +229,53 @@ public class MessageQueuePrevalence implements Initializable {
 
     journalWriter.write(eventSourceTopic, message);
 
-    if (!awaitedTransactionExecution.getDoneSignal().await(timeoutAmount, timeoutUnit)) {
-      // todo pass down doneSignal?
-      throw new TimeoutException("Timed out while waiting for transaction to be executed. It might still be executed later");
-    }
-    if (awaitedTransactionExecution.getTransactionExecutionException() != null) {
-      throw awaitedTransactionExecution.getTransactionExecutionException();
-    }
-    return (Response) awaitedTransactionExecution.getTransactionResponse();
+    return new Future<Response>() {
+      @Override
+      public boolean cancel(boolean mayInterruptIfRunning) {
+        throw new UnsupportedOperationException();
+      }
+
+      @Override
+      public boolean isCancelled() {
+        return false;
+      }
+
+      @Override
+      public boolean isDone() {
+        return awaitedTransactionExecution.getDoneSignal().getCount() == 0;
+      }
+
+      @Override
+      public Response get() throws InterruptedException, ExecutionException {
+        awaitedTransactionExecution.getDoneSignal().await();
+        if (awaitedTransactionExecution.getTransactionExecutionException() != null) {
+          throw new ExecutionException(awaitedTransactionExecution.getTransactionExecutionException());
+        }
+        return (Response) awaitedTransactionExecution.getTransactionResponse();
+      }
+
+      @Override
+      public Response get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+        if (!awaitedTransactionExecution.getDoneSignal().await(timeout, unit)) {
+          throw new TimeoutException("Timed out while waiting for transaction to be executed. It should still be executed later.");
+        }
+        if (awaitedTransactionExecution.getTransactionExecutionException() != null) {
+          throw new ExecutionException(awaitedTransactionExecution.getTransactionExecutionException());
+        }
+        return (Response) awaitedTransactionExecution.getTransactionResponse();
+      }
+    };
+
+  }
+
+  private <Payload> MessageQueueMessage messageFactory(Payload payload, EventSourceBinding eventSourceBinding) throws java.io.IOException {
+    MessageQueueMessage message = new MessageQueueMessage();
+    message.setIdentity(UUID.randomUUID());
+    message.setCreated(OffsetDateTime.now());
+    message.setPayload(objectMapper.readValue(objectMapper.writeValueAsString(payload), JsonNode.class));
+    message.setStereotype(eventSourceBinding.getStereotype());
+    message.setVersion(eventSourceBinding.getVersion());
+    return message;
   }
 
 
