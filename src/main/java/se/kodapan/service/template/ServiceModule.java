@@ -59,7 +59,11 @@ public class ServiceModule implements Module {
   @Singleton
   @Provides
   @Named("local fs message queue absolute root path")
-  public String localFsMessageQueueAbsoluteRootPath() {
+  public String localFsMessageQueueAbsoluteRootPathProvider() {
+    return localFsMessageQueueAbsoluteRootPathFactory();
+  }
+
+  protected String localFsMessageQueueAbsoluteRootPathFactory() {
     return new File("data/localfsmq").getAbsolutePath();
   }
 
@@ -85,5 +89,5 @@ public class ServiceModule implements Module {
     mapper.registerModule(new JavaTimeModule());
     return mapper;
   }
-
+  
 }

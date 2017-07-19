@@ -8,6 +8,6 @@ import se.kodapan.service.template.Initializable;
  */
 public interface MessageQueueWriter extends Initializable {
 
-  public abstract  void write(MessageQueueTopic topic, MessageQueueMessage message) throws Exception;
+  public abstract void write(MessageQueueTopic topic, MessageQueueMessage message) throws Exception;
 
 }

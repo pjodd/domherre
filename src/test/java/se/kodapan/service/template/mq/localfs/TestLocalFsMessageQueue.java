@@ -1,5 +1,7 @@
 package se.kodapan.service.template.mq.localfs;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Binder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -21,11 +23,20 @@ public class TestLocalFsMessageQueue {
 
   private MessageQueueTopic topic = new MessageQueueTopic("test", "event");
 
+  private ObjectMapper objectMapper = new ObjectMapper();
+
   @Test
   public void test() throws Exception {
 
-    LocalFsMessageQueueFactory factory = new LocalFsMessageQueueFactory();
-    factory.setAbsoluteRootPath("/tmp/localfsmq/" + System.currentTimeMillis());
+    Injector injector = Guice.createInjector(new ServiceModule("test", null) {
+      @Override
+      public String localFsMessageQueueAbsoluteRootPathFactory() {
+        return "/tmp/localfsmq/" + System.currentTimeMillis();
+      }
+    });
+
+    LocalFsMessageQueueFactory factory = injector.getInstance(LocalFsMessageQueueFactory.class);
+
     Assert.assertTrue(factory.open());
 
     MessageQueueReader reader = factory.readerFactory(topic, new MessageQueueConsumer() {
@@ -42,7 +53,7 @@ public class TestLocalFsMessageQueue {
     MessageQueueMessage message = new MessageQueueMessage();
     message.setStereotype("stereotype");
     message.setVersion(1);
-    message.setPayload("test test " + System.currentTimeMillis());
+    message.setPayload(objectMapper.readValue("{\"epoch\": " + System.currentTimeMillis() + "}", JsonNode.class));
     writer.write(topic, message);
 
 

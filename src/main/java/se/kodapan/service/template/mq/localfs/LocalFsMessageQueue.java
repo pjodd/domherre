@@ -1,5 +1,6 @@
 package se.kodapan.service.template.mq.localfs;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import se.kodapan.service.template.mq.MessageQueueMessage;
 import se.kodapan.service.template.mq.MessageQueueTopic;
@@ -17,8 +18,11 @@ public class LocalFsMessageQueue {
 
   private File rootPath;
 
-  public LocalFsMessageQueue(File rootPath) {
+  private ObjectMapper objectMapper;
+
+  public LocalFsMessageQueue(File rootPath, ObjectMapper objectMapper) {
     this.rootPath = rootPath;
+    this.objectMapper = objectMapper;
   }
 
   private Map<MessageQueueTopic, LocalFsMessageQueueTopic> topics = new HashMap<>();
@@ -33,7 +37,7 @@ public class LocalFsMessageQueue {
     synchronized (topics) {
       LocalFsMessageQueueTopic lfstopic = this.topics.get(topic);
       if (lfstopic == null) {
-        lfstopic = new LocalFsMessageQueueTopic(this, topic);
+        lfstopic = new LocalFsMessageQueueTopic(this, topic, objectMapper);
         lfstopic.open();
         topics.put(topic, lfstopic);
       }

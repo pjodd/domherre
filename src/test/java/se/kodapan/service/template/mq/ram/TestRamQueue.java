@@ -1,5 +1,7 @@
 package se.kodapan.service.template.mq.ram;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Test;
 import se.kodapan.service.template.mq.*;
@@ -16,6 +18,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * @since 2017-02-15 09:01
  */
 public class TestRamQueue {
+
+  private ObjectMapper objectMapper = new ObjectMapper();
 
   @Test
   public void test() throws Exception {
@@ -54,7 +58,7 @@ public class TestRamQueue {
       message.setCreated(OffsetDateTime.now());
       message.setStereotype("Test event");
       message.setVersion(1);
-      message.setPayload("{ \"key\": \"value\"}");
+      message.setPayload(objectMapper.readValue("{ \"key\": \"value\"}", JsonNode.class));
 
       writtenMessages.add(message);
       writer.write(topic, message);

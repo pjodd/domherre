@@ -1,5 +1,6 @@
 package se.kodapan.service.template.mq.kafka;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -37,8 +38,8 @@ public class KafkaReader extends AbstractMessageQueueReader {
     return Collections.EMPTY_MAP;
   }
 
-  public KafkaReader(MessageQueueTopic topic, MessageQueueConsumer consumer) {
-    super(topic, consumer);
+  public KafkaReader(MessageQueueTopic topic, MessageQueueConsumer consumer, ObjectMapper objectMapper) {
+    super(topic, consumer, objectMapper);
   }
 
   @Override
@@ -112,7 +113,7 @@ public class KafkaReader extends AbstractMessageQueueReader {
             try {
               if (!records.isEmpty()) {
                 for (ConsumerRecord<String, String> record : records) {
-                  MessageQueueMessage message = MessageQueueMessage.fromJSON(record.value());
+                  MessageQueueMessage message = getObjectMapper().readValue(record.value(), MessageQueueMessage.class);
                   try {
                     getConsumer().consume(message);
                   } catch (Exception e) {

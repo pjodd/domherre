@@ -1,5 +1,6 @@
 package se.kodapan.service.template.mq.devnull;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import se.kodapan.service.template.mq.*;
 
 import javax.inject.Singleton;

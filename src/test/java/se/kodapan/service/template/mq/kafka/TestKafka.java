@@ -1,5 +1,7 @@
 package se.kodapan.service.template.mq.kafka;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -17,6 +19,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * @since 2017-02-23 01:04
  */
 public class TestKafka {
+
+  private ObjectMapper objectMapper = new ObjectMapper();
 
   @Test
   @Ignore
@@ -58,7 +62,7 @@ public class TestKafka {
       message.setCreated(OffsetDateTime.now());
       message.setStereotype("Test event");
       message.setVersion(1);
-      message.setPayload("{ \"key\": \"value\"}");
+      message.setPayload(objectMapper.readValue("{ \"key\": \"value\"}", JsonNode.class));
 
       writtenMessages.add(message);
       writer.write(topic, message);

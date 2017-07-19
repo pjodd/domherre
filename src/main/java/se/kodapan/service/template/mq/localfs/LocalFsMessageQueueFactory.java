@@ -1,5 +1,6 @@
 package se.kodapan.service.template.mq.localfs;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import se.kodapan.service.template.Initializable;
@@ -21,9 +22,12 @@ public class LocalFsMessageQueueFactory implements MessageQueueFactory, Initiali
 
   private LocalFsMessageQueue messageQueue;
 
+  @Inject
+  private ObjectMapper objectMapper;
+
   @Override
   public boolean open() throws Exception {
-    messageQueue = new LocalFsMessageQueue(new File(absoluteRootPath));
+    messageQueue = new LocalFsMessageQueue(new File(absoluteRootPath), objectMapper);
     return true;
   }
 
@@ -42,9 +46,6 @@ public class LocalFsMessageQueueFactory implements MessageQueueFactory, Initiali
     return new LocalFsMessageQueueWriter(messageQueue);
   }
 
-  void setAbsoluteRootPath(String absoluteRootPath) {
-    this.absoluteRootPath = absoluteRootPath;
-  }
 }
 
 

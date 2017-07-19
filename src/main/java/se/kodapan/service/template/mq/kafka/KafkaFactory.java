@@ -1,5 +1,7 @@
 package se.kodapan.service.template.mq.kafka;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import se.kodapan.service.template.mq.*;
 
@@ -10,9 +12,12 @@ import se.kodapan.service.template.mq.*;
 @Singleton
 public class KafkaFactory implements MessageQueueFactory {
 
+  @Inject
+  private ObjectMapper objectMapper;
+
   @Override
   public MessageQueueReader readerFactory(MessageQueueTopic topic, MessageQueueConsumer consumer) {
-    return new KafkaReader(topic, consumer);
+    return new KafkaReader(topic, consumer, objectMapper);
   }
 
   @Override

@@ -4,11 +4,11 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>se.kodapan.brfduva</groupId>
+  <groupId>se.kodapan</groupId>
   <artifactId>java-service-template</artifactId>
   <version>0.0.1-SNAPSHOT</version>
 
-  <packaging>war</packaging>
+  <packaging>jar</packaging>
   <name>java-service-template</name>
 
   <properties>
@@ -50,13 +50,7 @@
       <artifactId>dropwizard-jackson</artifactId>
       <version>${dropwizard.version}</version>
     </dependency>
-
-    <dependency>
-      <groupId>org.json</groupId>
-      <artifactId>json</artifactId>
-      <version>20160212</version>
-    </dependency>
-
+    
     <dependency>
       <groupId>javax.ws.rs</groupId>
       <artifactId>javax.ws.rs-api</artifactId>

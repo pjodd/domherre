@@ -1,5 +1,6 @@
 package se.kodapan.service.template.prevalence;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.reflect.ClassPath;
 import com.google.inject.Inject;
@@ -100,7 +101,7 @@ public class MessageQueuePrevalence implements Initializable {
             Object payload;
             Transaction transaction;
             try {
-              payload = objectMapper.readValue(message.getPayload(), binding.getPayloadClass());
+              payload = objectMapper.readValue(objectMapper.writeValueAsString(message.getPayload()), binding.getPayloadClass());
               transaction = binding.getTransactionClass().newInstance();
             } catch (Exception e) {
               log.error("Exception while preparing to execute transaction", e);
@@ -188,7 +189,7 @@ public class MessageQueuePrevalence implements Initializable {
     MessageQueueMessage message = new MessageQueueMessage();
     message.setIdentity(UUID.randomUUID());
     message.setCreated(OffsetDateTime.now());
-    message.setPayload(objectMapper.writeValueAsString(payload));
+    message.setPayload(objectMapper.readValue(objectMapper.writeValueAsString(payload), JsonNode.class));
     message.setStereotype(eventSourceBinding.getStereotype());
     message.setVersion(eventSourceBinding.getVersion());
 

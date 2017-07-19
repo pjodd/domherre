@@ -1,5 +1,7 @@
 package se.kodapan.service.template.mq.localfs;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.gwizard.services.Run;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,9 +27,12 @@ public class LocalFsMessageQueueTopic {
   private LocalFsMessageQueue queue;
   private MessageQueueTopic topic;
 
-  public LocalFsMessageQueueTopic(LocalFsMessageQueue queue, MessageQueueTopic topic) {
+  private ObjectMapper objectMapper;
+
+  public LocalFsMessageQueueTopic(LocalFsMessageQueue queue, MessageQueueTopic topic, ObjectMapper objectMapper) {
     this.queue = queue;
     this.topic = topic;
+    this.objectMapper = objectMapper;
   }
 
   private ReadWriteLock lock = new ReentrantReadWriteLock();
@@ -160,21 +165,26 @@ public class LocalFsMessageQueueTopic {
   }
 
   private void writeMessage(ObjectOutputStream oos, MessageQueueMessage message) throws IOException {
+    oos.writeInt(1); // posting version
     oos.writeLong(message.getIdentity().getMostSignificantBits());
     oos.writeLong(message.getIdentity().getLeastSignificantBits());
     oos.writeUTF(message.getStereotype());
     oos.writeInt(message.getVersion());
     oos.writeUTF(message.getCreated().toString());
-    oos.writeUTF(message.getPayload());
+    oos.writeUTF(objectMapper.writeValueAsString(message.getPayload()));
   }
 
   private MessageQueueMessage readMessage(ObjectInputStream ois) throws IOException {
+    int postingVersion = ois.readInt();
+    if (postingVersion != 1) {
+      throw new UnsupportedEncodingException("Expected posting version 1");
+    }
     MessageQueueMessage message = new MessageQueueMessage();
     message.setIdentity(new UUID(ois.readLong(), ois.readLong()));
     message.setStereotype(ois.readUTF());
     message.setVersion(ois.readInt());
     message.setCreated(OffsetDateTime.parse(ois.readUTF()));
-    message.setPayload(ois.readUTF());
+    message.setPayload(objectMapper.readValue(ois.readUTF(), JsonNode.class));
     return message;
   }
 

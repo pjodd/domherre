@@ -1,5 +1,6 @@
 package se.kodapan.service.template.mq;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 
 /**
@@ -14,9 +15,13 @@ public abstract class AbstractMessageQueueReader implements MessageQueueReader {
   @Getter
   private MessageQueueConsumer consumer;
 
-  public AbstractMessageQueueReader(MessageQueueTopic topic, MessageQueueConsumer consumer) {
+  @Getter
+  private ObjectMapper objectMapper;
+
+  public AbstractMessageQueueReader(MessageQueueTopic topic, MessageQueueConsumer consumer, ObjectMapper objectMapper) {
     this.topic = topic;
     this.consumer = consumer;
+    this.objectMapper = objectMapper;
   }
   
 }

@@ -1,10 +1,10 @@
 package se.kodapan.service.template.mq.kafka;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.Inject;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
-import org.json.JSONObject;
-import org.json.JSONTokener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.kodapan.service.template.mq.MessageQueueMessage;
@@ -24,6 +24,9 @@ import java.util.concurrent.Future;
 public class KafkaWriter implements MessageQueueWriter {
 
   private Logger log = LoggerFactory.getLogger(getClass());
+
+  @Inject
+  private ObjectMapper objectMapper;
 
   private KafkaProducer<String, String> kafkaProducer;
 
@@ -61,17 +64,12 @@ public class KafkaWriter implements MessageQueueWriter {
 
   @Override
   public void write(MessageQueueTopic topic, MessageQueueMessage message) throws Exception {
-    JSONObject json = new JSONObject();
-    json.put("stereotype", message.getStereotype());
-    json.put("version", message.getVersion());
-    json.put("identity", message.getIdentity().toString());
-    json.put("created", message.getCreated().toString());
-    json.put("payload", new JSONObject(new JSONTokener(message.getPayload())));
-    write(topic, json.toString());
+    write(topic, objectMapper.writeValueAsString(message));
   }
 
   public void write(MessageQueueTopic topic, String message) throws Exception {
     Future<RecordMetadata> future = kafkaProducer.send(new ProducerRecord<>(topic.toString(), message));
+    // todo really wait for the future?
     RecordMetadata recordMetadata = future.get();
     System.currentTimeMillis();
   }

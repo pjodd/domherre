@@ -1,5 +1,6 @@
 package se.kodapan.service.template.mq.ram;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.kodapan.service.template.mq.AbstractMessageQueueReader;
@@ -24,8 +25,8 @@ public class RamQueueReader extends AbstractMessageQueueReader {
 
   private Poller poller;
 
-  public RamQueueReader(RamMessageQueue ramMessageQueue, MessageQueueTopic topic, MessageQueueConsumer consumer) {
-    super(topic, consumer);
+  public RamQueueReader(RamMessageQueue ramMessageQueue, MessageQueueTopic topic, MessageQueueConsumer consumer, ObjectMapper objectMapper) {
+    super(topic, consumer, objectMapper);
     this.ramMessageQueue = ramMessageQueue;
   }
 

@@ -1,5 +1,7 @@
 package se.kodapan.service.template.mq.ram;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.Inject;
 import se.kodapan.service.template.mq.*;
 
 import javax.inject.Singleton;
@@ -13,9 +15,12 @@ public class RamQueueFactory implements MessageQueueFactory {
 
   private RamMessageQueue ramMessageQueue = new RamMessageQueue();
 
+  @Inject
+  private ObjectMapper objectMapper;
+
   @Override
   public MessageQueueReader readerFactory(MessageQueueTopic topic, MessageQueueConsumer consumer) {
-    return new RamQueueReader(ramMessageQueue, topic, consumer);
+    return new RamQueueReader(ramMessageQueue, topic, consumer, objectMapper);
   }
 
   @Override
