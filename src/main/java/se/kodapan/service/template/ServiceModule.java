@@ -25,22 +25,13 @@ import java.io.File;
 public class ServiceModule implements Module {
 
   private String serviceName;
-  private Class rootClass;
 
-  public ServiceModule(String serviceName, Class rootClass) {
+  public ServiceModule(String serviceName) {
     this.serviceName = serviceName;
-    this.rootClass = rootClass;
   }
 
   @Override
   public void configure(Binder binder) {
-    binder.bind(MessageQueueFactory.class).annotatedWith(Names.named("prevalence journal factory")).to(KafkaFactory.class);
-  }
-
-  @Provides
-  @Named("prevalence root")
-  public Object rootFactory() throws Exception {
-    return rootClass.newInstance();
   }
 
   @Provides
@@ -49,23 +40,6 @@ public class ServiceModule implements Module {
     return serviceName;
   }
 
-  @Singleton
-  @Provides
-  @Named("prevalence journal topic")
-  public MessageQueueTopic prevalenceJournalTopicFactory() {
-    return new MessageQueueTopic(serviceName, "prevalence-journal");
-  }
-
-  @Singleton
-  @Provides
-  @Named("local fs message queue absolute root path")
-  public String localFsMessageQueueAbsoluteRootPathProvider() {
-    return localFsMessageQueueAbsoluteRootPathFactory();
-  }
-
-  protected String localFsMessageQueueAbsoluteRootPathFactory() {
-    return new File("data/localfsmq").getAbsolutePath();
-  }
 
   public int getServerPort() {
     return 8080;

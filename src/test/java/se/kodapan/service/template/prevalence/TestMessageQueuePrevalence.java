@@ -3,6 +3,7 @@ package se.kodapan.service.template.prevalence;
 import com.google.inject.Binder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Module;
 import com.google.inject.name.Names;
 import junit.framework.Assert;
 import lombok.Data;
@@ -11,6 +12,8 @@ import se.kodapan.service.template.ServiceModule;
 import se.kodapan.service.template.mq.MessageQueueFactory;
 import se.kodapan.service.template.mq.ram.RamQueueFactory;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -22,14 +25,15 @@ public class TestMessageQueuePrevalence {
   @Test
   public void test() throws Exception {
 
-    Injector injector = Guice.createInjector(new ServiceModule("test", Root.class) {
-
+    List<Module> modules = new ArrayList<>();
+    modules.add(new ServiceModule("test"));
+    modules.add(new PrevalenceModule(Root.class) {
       @Override
       public void configure(Binder binder) {
         binder.bind(MessageQueueFactory.class).annotatedWith(Names.named("prevalence journal factory")).to(RamQueueFactory.class);
       }
-
     });
+    Injector injector = Guice.createInjector(modules);
 
     Prevalence prevalence = injector.getInstance(Prevalence.class);
     MessageQueuePrevalence messageQueuePrevalence = injector.getInstance(MessageQueuePrevalence.class);

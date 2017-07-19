@@ -5,15 +5,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Binder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Module;
 import com.google.inject.name.Names;
 import junit.framework.Assert;
 import org.junit.Test;
+import se.kodapan.service.TestService;
 import se.kodapan.service.template.ServiceModule;
 import se.kodapan.service.template.mq.*;
 import se.kodapan.service.template.mq.ram.RamQueueFactory;
+import se.kodapan.service.template.prevalence.PrevalenceModule;
 import se.kodapan.service.template.prevalence.TestMessageQueuePrevalence;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author kalle
@@ -28,12 +33,10 @@ public class TestLocalFsMessageQueue {
   @Test
   public void test() throws Exception {
 
-    Injector injector = Guice.createInjector(new ServiceModule("test", null) {
-      @Override
-      public String localFsMessageQueueAbsoluteRootPathFactory() {
-        return "/tmp/localfsmq/" + System.currentTimeMillis();
-      }
-    });
+    List<Module> modules = new ArrayList<>();
+    modules.add(new ServiceModule("test"));
+    modules.add(new LocalFsMessageQueueModule("/tmp/localfsmq/" + System.currentTimeMillis()));
+    Injector injector = Guice.createInjector(modules);
 
     LocalFsMessageQueueFactory factory = injector.getInstance(LocalFsMessageQueueFactory.class);
 

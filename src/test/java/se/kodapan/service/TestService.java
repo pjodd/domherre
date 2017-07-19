@@ -1,6 +1,8 @@
 package se.kodapan.service;
 
 import com.google.inject.Binder;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.name.Names;
 import junit.framework.Assert;
@@ -10,6 +12,8 @@ import se.kodapan.service.template.Service;
 import se.kodapan.service.template.ServiceModule;
 import se.kodapan.service.template.mq.MessageQueueFactory;
 import se.kodapan.service.template.mq.ram.RamQueueFactory;
+import se.kodapan.service.template.prevalence.PrevalenceModule;
+import se.kodapan.service.template.prevalence.TestMessageQueuePrevalence;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,18 +27,17 @@ public class TestService {
   @Test
   public void test() throws Exception {
 
-    ServiceModule serviceModule = new ServiceModule("test", Root.class) {
+    List<Module> modules = new ArrayList<>();
+    modules.add(new ServiceModule("test"));
+    modules.add(new PrevalenceModule(Root.class) {
       @Override
       public void configure(Binder binder) {
         binder.bind(MessageQueueFactory.class).annotatedWith(Names.named("prevalence journal factory")).to(RamQueueFactory.class);
       }
-    };
-
+    });
     Service service = new Service() {
       @Override
       public List<Module> getModules() {
-        List<Module> modules = new ArrayList<>();
-        modules.add(serviceModule);
         return modules;
       }
 
