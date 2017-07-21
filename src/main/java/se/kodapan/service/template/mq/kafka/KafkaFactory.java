@@ -22,6 +22,6 @@ public class KafkaFactory implements MessageQueueFactory {
 
   @Override
   public MessageQueueWriter writerFactory() {
-    return new KafkaWriter();
+    return new KafkaWriter(objectMapper);
   }
 }

@@ -32,7 +32,7 @@ public class KafkaReader extends AbstractMessageQueueReader {
   private Poller poller;
   private Consumer<String, String> kafkaConsumer;
 
-  private String kafkaBootstrapList = Environment.getValue("kafka.bootstrap.servers", "172.17.0.3:9092");
+  private String kafkaBootstrapList = Environment.getValue("kafka.bootstrap.servers", "172.16.61.129:9092");
 
   private Map<String, String> getAdditionalKafkaProperties() {
     return Collections.EMPTY_MAP;
@@ -47,7 +47,7 @@ public class KafkaReader extends AbstractMessageQueueReader {
 
     Properties config = new Properties();
 
-    config.put("bootstrap.servers", getKafkaBootstrapList());
+    config.put("bootstrap.servers", kafkaBootstrapList);
     config.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
     config.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
     config.put("auto.offset.reset", "earliest");
@@ -135,11 +135,4 @@ public class KafkaReader extends AbstractMessageQueueReader {
 
   }
 
-  public String getKafkaBootstrapList() {
-    return kafkaBootstrapList;
-  }
-
-  public void setKafkaBootstrapList(String kafkaBootstrapList) {
-    this.kafkaBootstrapList = kafkaBootstrapList;
-  }
 }

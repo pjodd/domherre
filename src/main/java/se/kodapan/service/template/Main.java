@@ -21,7 +21,6 @@ public class Main {
 
     Logger log = LoggerFactory.getLogger(Main.class);
 
-
     List<Class<? extends Service>> serviceClasses = new ArrayList<>();
 
     ClassLoader cl = Main.class.getClassLoader();

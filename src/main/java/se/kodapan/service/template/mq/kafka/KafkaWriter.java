@@ -25,15 +25,18 @@ public class KafkaWriter implements MessageQueueWriter {
 
   private Logger log = LoggerFactory.getLogger(getClass());
 
-  @Inject
   private ObjectMapper objectMapper;
 
   private KafkaProducer<String, String> kafkaProducer;
 
-  private String kafkaBootstrapList = Environment.getValue("kafka.bootstrap.servers", "172.17.0.3:9092");
+  private String kafkaBootstrapList = Environment.getValue("kafka.bootstrap.servers", "172.16.61.129:9092");
 
   private Map<String, String> getAdditionalKafkaProperties() {
     return Collections.EMPTY_MAP;
+  }
+
+  public KafkaWriter(ObjectMapper objectMapper) {
+    this.objectMapper = objectMapper;
   }
 
   @Override
