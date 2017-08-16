@@ -3,6 +3,7 @@ package se.kodapan.service.template;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
+import lombok.Getter;
 import org.gwizard.services.Run;
 import org.gwizard.swagger.SwaggerModule;
 import org.slf4j.Logger;
@@ -24,6 +25,13 @@ public class Service {
 
   private Logger log = LoggerFactory.getLogger(getClass());
 
+  @Getter
+  private String serviceName;
+
+  public Service(String serviceName) {
+    this.serviceName = serviceName;
+  }
+
   private Injector injector;
 
   public void run() {
@@ -33,6 +41,8 @@ public class Service {
   public boolean open() throws Exception {
 
     List<Module> modules = new ArrayList<>();
+
+    modules.add(new ServiceModule(serviceName));
 
     modules.add(new ServletModule());
     modules.add(new SwaggerModule()); // depends on actions in ServletModule

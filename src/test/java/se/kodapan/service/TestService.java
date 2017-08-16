@@ -24,20 +24,19 @@ public class TestService {
   @Test
   public void test() throws Exception {
 
-    List<Module> modules = new ArrayList<>();
-    modules.add(new ServiceModule("test"));
-    modules.add(new PrevalenceModule(Root.class, "test") {
-      @Override
-      public void configure(Binder binder) {
-        binder.bind(MessageQueueFactory.class).annotatedWith(Names.named(PrevalenceModule.PREVALENCE_JOURNAL_FACTORY)).to(RamQueueFactory.class);
-      }
-    });
-    Service service = new Service() {
+
+    Service service = new Service("test") {
       @Override
       public List<Module> getModules() {
+        List<Module> modules = new ArrayList<>();
+        modules.add(new PrevalenceModule(Root.class, getServiceName()) {
+          @Override
+          public void configure(Binder binder) {
+            binder.bind(MessageQueueFactory.class).annotatedWith(Names.named(PrevalenceModule.PREVALENCE_JOURNAL_FACTORY)).to(RamQueueFactory.class);
+          }
+        });
         return modules;
       }
-
     };
 
     Assert.assertTrue(service.open());

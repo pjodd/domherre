@@ -10,6 +10,7 @@ import com.google.inject.Module;
 import com.google.inject.Provides;
 import com.google.inject.name.Named;
 import org.gwizard.web.WebConfig;
+import se.kodapan.service.template.util.Environment;
 
 import javax.inject.Singleton;
 
