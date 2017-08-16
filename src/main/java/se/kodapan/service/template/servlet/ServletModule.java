@@ -1,12 +1,17 @@
 package se.kodapan.service.template.servlet;
 
 import com.google.common.reflect.ClassPath;
+import com.google.inject.Provides;
 import org.gwizard.rest.RestModule;
+import org.gwizard.swagger.SwaggerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.Path;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -28,6 +33,8 @@ public class ServletModule extends com.google.inject.servlet.ServletModule {
     ClassLoader cl = getClass().getClassLoader();
     Set<ClassPath.ClassInfo> classesInPackage;
 
+    Set<Package> pathPackages = new HashSet<>();
+
     try {
       classesInPackage = ClassPath.from(cl).getTopLevelClassesRecursive("se.kodapan.service");
     } catch (IOException ioe) {
@@ -45,8 +52,25 @@ public class ServletModule extends com.google.inject.servlet.ServletModule {
       if (pathAnnotatedClass.isAnnotationPresent(Path.class)) {
         log.info("Binding @Path-annotated class " + pathAnnotatedClass.getName());
         bind(pathAnnotatedClass);
+        pathPackages.add(pathAnnotatedClass.getPackage());
       }
     }
 
+    // configure swagger
+    List<String> resourcePackages = new ArrayList<>(pathPackages.size());
+    for (Package pack : pathPackages) {
+      resourcePackages.add(pack.getName());
+    }
+    swaggerConfig = new SwaggerConfig();
+    swaggerConfig.setResourcePackages(resourcePackages);
+
   }
+
+  private SwaggerConfig swaggerConfig;
+
+  @Provides
+  public SwaggerConfig swaggerConfig() {
+    return swaggerConfig;
+  }
+
 }

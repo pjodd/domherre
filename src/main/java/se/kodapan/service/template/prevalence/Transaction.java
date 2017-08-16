@@ -1,5 +1,7 @@
 package se.kodapan.service.template.prevalence;
 
+import se.kodapan.service.template.mq.MessageQueueMessage;
+
 import java.time.OffsetDateTime;
 
 /**
@@ -8,8 +10,10 @@ import java.time.OffsetDateTime;
  */
 public interface Transaction<Root, Payload, Response> {
 
+  /** @see MessageQueueMessage#getStereotype() */
   public abstract String getStereotype();
 
+  /** @see MessageQueueMessage#getVersion() */
   public abstract Integer getVersion();
 
   public abstract Class<Payload> getPayloadClass();

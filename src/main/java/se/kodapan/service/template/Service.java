@@ -4,6 +4,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import org.gwizard.services.Run;
+import org.gwizard.swagger.SwaggerModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.kodapan.service.template.prevalence.MessageQueuePrevalence;
@@ -32,8 +33,12 @@ public class Service {
   public boolean open() throws Exception {
 
     List<Module> modules = new ArrayList<>();
-    modules.addAll(getModules());
+
     modules.add(new ServletModule());
+    modules.add(new SwaggerModule()); // depends on actions in ServletModule
+
+    modules.addAll(getModules());
+
     injector = Guice.createInjector(modules);
 
 
