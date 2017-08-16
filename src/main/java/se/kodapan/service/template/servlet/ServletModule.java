@@ -59,6 +59,7 @@ public class ServletModule extends com.google.inject.servlet.ServletModule {
     // configure swagger
     List<String> resourcePackages = new ArrayList<>(pathPackages.size());
     for (Package pack : pathPackages) {
+      log.info("Registering Swagger resource package {}", pack.getName());
       resourcePackages.add(pack.getName());
     }
     swaggerConfig = new SwaggerConfig();
