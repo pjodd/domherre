@@ -27,12 +27,11 @@ public class PrevalenceModule implements Module {
 
   private Class rootClass;
 
-  @Inject
-  @Named(SERVICE_NAME)
   private String serviceName;
 
-  public PrevalenceModule(Class rootClass) {
+  public PrevalenceModule(Class rootClass, String serviceName) {
     this.rootClass = rootClass;
+    this.serviceName = serviceName;
   }
 
   @Override

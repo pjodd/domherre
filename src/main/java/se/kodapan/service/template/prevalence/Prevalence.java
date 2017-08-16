@@ -1,6 +1,7 @@
 package se.kodapan.service.template.prevalence;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,6 +17,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @author kalle
  * @since 2017-02-12 22:06
  */
+@Singleton
 public class Prevalence {
 
   private Logger log = LoggerFactory.getLogger(getClass());

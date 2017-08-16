@@ -26,7 +26,7 @@ public class TestService {
 
     List<Module> modules = new ArrayList<>();
     modules.add(new ServiceModule("test"));
-    modules.add(new PrevalenceModule(Root.class) {
+    modules.add(new PrevalenceModule(Root.class, "test") {
       @Override
       public void configure(Binder binder) {
         binder.bind(MessageQueueFactory.class).annotatedWith(Names.named(PrevalenceModule.PREVALENCE_JOURNAL_FACTORY)).to(RamQueueFactory.class);
