@@ -9,6 +9,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import static se.kodapan.service.template.ServiceModule.SERVICE_NAME;
+
 /**
  * @author kalle
  * @since 2017-03-07 22:31
@@ -17,7 +19,7 @@ import javax.ws.rs.core.MediaType;
 public class Ping {
 
   @Inject
-  @Named("service name")
+  @Named(SERVICE_NAME)
   private String serviceName;
 
   @Path("ping")
