@@ -6,13 +6,16 @@ import com.google.inject.name.Names;
 import junit.framework.Assert;
 import lombok.Data;
 import org.junit.Test;
+import se.kodapan.service.template.Initializable;
 import se.kodapan.service.template.Service;
 import se.kodapan.service.template.ServiceModule;
 import se.kodapan.service.template.mq.MessageQueueFactory;
 import se.kodapan.service.template.mq.ram.RamQueueFactory;
+import se.kodapan.service.template.prevalence.MessageQueuePrevalence;
 import se.kodapan.service.template.prevalence.PrevalenceModule;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -26,6 +29,12 @@ public class TestService {
 
 
     Service service = new Service("test") {
+
+      @Override
+      public List<Class<? extends Initializable>> getInitializables() {
+        return Collections.singletonList(MessageQueuePrevalence.class);
+      }
+
       @Override
       public List<Module> getModules() {
         List<Module> modules = new ArrayList<>();

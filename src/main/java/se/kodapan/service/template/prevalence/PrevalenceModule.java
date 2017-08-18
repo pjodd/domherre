@@ -15,6 +15,8 @@ import javax.inject.Singleton;
 import static se.kodapan.service.template.ServiceModule.SERVICE_NAME;
 
 /**
+ * You are required to add MessageQueuePrevalence.class to service initializables
+ *
  * @author kalle
  * @since 2017-07-19
  */

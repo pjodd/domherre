@@ -9,6 +9,7 @@ import org.gwizard.swagger.SwaggerModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.kodapan.service.template.prevalence.MessageQueuePrevalence;
+import se.kodapan.service.template.prevalence.PrevalenceModule;
 import se.kodapan.service.template.servlet.ServletModule;
 
 import java.util.ArrayList;
@@ -54,7 +55,6 @@ public class Service {
 
     {
       List<Initializable> unopnenedInitializables = new ArrayList<>();
-      unopnenedInitializables.add(injector.getInstance(MessageQueuePrevalence.class));
 
       for (Class<? extends Initializable> initializableClass : getInitializables()) {
         Initializable initializable = injector.getInstance(initializableClass);
