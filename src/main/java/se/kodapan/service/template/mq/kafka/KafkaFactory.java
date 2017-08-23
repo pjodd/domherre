@@ -16,8 +16,8 @@ public class KafkaFactory implements MessageQueueFactory {
   private ObjectMapper objectMapper;
 
   @Override
-  public MessageQueueReader readerFactory(MessageQueueTopic topic, MessageQueueConsumer consumer) {
-    return new KafkaReader(topic, consumer, objectMapper);
+  public MessageQueueReader readerFactory(MessageQueueReaderConfiguration configuration, MessageQueueConsumer consumer) {
+    return new KafkaReader(configuration, consumer, objectMapper);
   }
 
   @Override

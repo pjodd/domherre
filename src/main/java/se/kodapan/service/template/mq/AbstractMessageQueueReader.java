@@ -10,7 +10,7 @@ import lombok.Getter;
 public abstract class AbstractMessageQueueReader implements MessageQueueReader {
 
   @Getter
-  private MessageQueueTopic topic;
+  private MessageQueueReaderConfiguration configuration;
 
   @Getter
   private MessageQueueConsumer consumer;
@@ -18,8 +18,8 @@ public abstract class AbstractMessageQueueReader implements MessageQueueReader {
   @Getter
   private ObjectMapper objectMapper;
 
-  public AbstractMessageQueueReader(MessageQueueTopic topic, MessageQueueConsumer consumer, ObjectMapper objectMapper) {
-    this.topic = topic;
+  public AbstractMessageQueueReader(MessageQueueReaderConfiguration configuration, MessageQueueConsumer consumer, ObjectMapper objectMapper) {
+    this.configuration = configuration;
     this.consumer = consumer;
     this.objectMapper = objectMapper;
   }

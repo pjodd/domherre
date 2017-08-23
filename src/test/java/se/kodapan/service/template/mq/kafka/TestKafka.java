@@ -47,7 +47,7 @@ public class TestKafka {
 
     final List<MessageQueueMessage> consumed = new ArrayList<>();
 
-    MessageQueueReader reader = factory.readerFactory(topic, new MessageQueueConsumer() {
+    MessageQueueReader reader = factory.readerFactory(new MessageQueueReaderConfiguration(topic), new MessageQueueConsumer() {
       @Override
       public void consume(MessageQueueMessage message) {
         Assert.assertTrue(TestKafka.equals(writtenMessages.poll(), message));

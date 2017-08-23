@@ -4,10 +4,13 @@ import com.google.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.kodapan.service.template.mq.MessageQueueMessage;
+import se.kodapan.service.template.mq.MessageQueueReaderConfiguration;
 import se.kodapan.service.template.mq.MessageQueueTopic;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
@@ -19,16 +22,47 @@ public class RamMessageQueue {
 
   private Logger log = LoggerFactory.getLogger(getClass());
 
-  private Map<MessageQueueTopic, ConcurrentLinkedQueue<MessageQueueMessage>> queueByTopic = new HashMap<>();
+  private Map<MessageQueueTopic, Set<ConcurrentLinkedQueue<MessageQueueMessage>>> queuesByTopic = new HashMap<>();
 
-  public synchronized ConcurrentLinkedQueue<MessageQueueMessage> getQueueByTopic(MessageQueueTopic topic) {
-    ConcurrentLinkedQueue<MessageQueueMessage> queue = queueByTopic.get(topic);
-    if (queue == null) {
-      log.debug("Created queue with topic '" + topic + "'");
-      queue = new ConcurrentLinkedQueue<>();
-      queueByTopic.put(topic, queue);
+  public Set<ConcurrentLinkedQueue<MessageQueueMessage>> getQueuesByTopic(MessageQueueTopic topic) {
+    synchronized (queuesByTopic) {
+      Set<ConcurrentLinkedQueue<MessageQueueMessage>> queues = queuesByTopic.get(topic);
+      if (queues == null) {
+        log.debug("Created queues set with topic '" + topic + "'");
+        queues = new HashSet<>();
+        queuesByTopic.put(topic, queues);
+      }
+      return queues;
     }
-    return queue;
   }
 
+  public void queueMessage(MessageQueueTopic topic, MessageQueueMessage message) {
+    synchronized (queuesByTopic) {
+      for (ConcurrentLinkedQueue<MessageQueueMessage> queue : getQueuesByTopic(topic)) {
+        queue.add(message);
+      }
+    }
+  }
+
+  public ConcurrentLinkedQueue<MessageQueueMessage> registerQueue(MessageQueueReaderConfiguration configuration) {
+    synchronized (queuesByTopic) {
+      if (queuesByTopic.containsKey(configuration.getTopic())
+          && !MessageQueueReaderConfiguration.StartOffset.latest.equals(configuration.getStartOffset())) {
+        throw new UnsupportedOperationException("StartOffset must be latest");
+      }
+      // todo group
+      ConcurrentLinkedQueue<MessageQueueMessage> queue = new ConcurrentLinkedQueue<>();
+      getQueuesByTopic(configuration.getTopic()).add(queue);
+      return queue;
+    }
+  }
+
+  public void unregisterQueue(ConcurrentLinkedQueue<MessageQueueMessage> queue) {
+    synchronized (queuesByTopic) {
+      for (Set<ConcurrentLinkedQueue<MessageQueueMessage>> queues : queuesByTopic.values()) {
+        queues.remove(queue);
+      }
+    }
+  }
+  
 }

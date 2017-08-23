@@ -35,7 +35,7 @@ public class TestLocalFsMessageQueue {
 
     Assert.assertTrue(factory.open());
 
-    MessageQueueReader reader = factory.readerFactory(topic, new MessageQueueConsumer() {
+    MessageQueueReader reader = factory.readerFactory(new MessageQueueReaderConfiguration(topic), new MessageQueueConsumer() {
       @Override
       public void consume(MessageQueueMessage message) {
         System.out.println(message.toString());

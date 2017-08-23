@@ -12,8 +12,8 @@ import javax.inject.Singleton;
 public class DevNullMessageQueueFactory implements MessageQueueFactory {
 
   @Override
-  public MessageQueueReader readerFactory(MessageQueueTopic topic, MessageQueueConsumer consumer) {
-    return new DevNullMessageQueueReader(topic, consumer);
+  public MessageQueueReader readerFactory(MessageQueueReaderConfiguration configuration, MessageQueueConsumer consumer) {
+    return new DevNullMessageQueueReader(configuration, consumer);
   }
 
   @Override

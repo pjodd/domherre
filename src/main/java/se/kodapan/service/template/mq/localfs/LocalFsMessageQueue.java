@@ -29,7 +29,7 @@ public class LocalFsMessageQueue {
 
 
   void register(LocalFsMessageQueueReader reader) throws Exception {
-    LocalFsMessageQueueTopic topic = getTopic(reader.getTopic());
+    LocalFsMessageQueueTopic topic = getTopic(reader.getConfiguration().getTopic());
     topic.register(reader);
   }
 
@@ -47,7 +47,7 @@ public class LocalFsMessageQueue {
 
   void unregister(LocalFsMessageQueueReader reader) {
     synchronized (topics) {
-      LocalFsMessageQueueTopic topic = this.topics.get(reader.getTopic());
+      LocalFsMessageQueueTopic topic = this.topics.get(reader.getConfiguration().getTopic());
       if (topic != null) {
         topic.unregister(reader);
       }

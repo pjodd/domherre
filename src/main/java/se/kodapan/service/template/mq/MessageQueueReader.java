@@ -8,7 +8,7 @@ import se.kodapan.service.template.Initializable;
  */
 public interface MessageQueueReader extends Initializable {
 
-  public abstract MessageQueueTopic getTopic();
+  public abstract MessageQueueReaderConfiguration getConfiguration();
 
   public abstract MessageQueueConsumer getConsumer();
 

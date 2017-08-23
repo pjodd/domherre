@@ -19,8 +19,8 @@ public class RamQueueFactory implements MessageQueueFactory {
   private ObjectMapper objectMapper;
 
   @Override
-  public MessageQueueReader readerFactory(MessageQueueTopic topic, MessageQueueConsumer consumer) {
-    return new RamQueueReader(ramMessageQueue, topic, consumer, objectMapper);
+  public MessageQueueReader readerFactory(MessageQueueReaderConfiguration configuration, MessageQueueConsumer consumer) {
+    return new RamQueueReader(ramMessageQueue, configuration, consumer, objectMapper);
   }
 
   @Override

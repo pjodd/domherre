@@ -37,8 +37,8 @@ public class LocalFsMessageQueueFactory implements MessageQueueFactory, Initiali
   }
 
   @Override
-  public MessageQueueReader readerFactory(MessageQueueTopic topic, MessageQueueConsumer consumer) {
-    return new LocalFsMessageQueueReader(messageQueue, topic, consumer);
+  public MessageQueueReader readerFactory(MessageQueueReaderConfiguration configuration, MessageQueueConsumer consumer) {
+    return new LocalFsMessageQueueReader(messageQueue, configuration, consumer);
   }
 
   @Override

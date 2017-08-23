@@ -7,10 +7,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import se.kodapan.service.template.mq.AbstractMessageQueueReader;
-import se.kodapan.service.template.mq.MessageQueueConsumer;
-import se.kodapan.service.template.mq.MessageQueueMessage;
-import se.kodapan.service.template.mq.MessageQueueTopic;
+import se.kodapan.service.template.mq.*;
 import se.kodapan.service.template.util.Environment;
 
 import java.util.Collections;
@@ -38,8 +35,8 @@ public class KafkaReader extends AbstractMessageQueueReader {
     return Collections.EMPTY_MAP;
   }
 
-  public KafkaReader(MessageQueueTopic topic, MessageQueueConsumer consumer, ObjectMapper objectMapper) {
-    super(topic, consumer, objectMapper);
+  public KafkaReader(MessageQueueReaderConfiguration configuration, MessageQueueConsumer consumer, ObjectMapper objectMapper) {
+    super(configuration, consumer, objectMapper);
   }
 
   @Override
@@ -50,13 +47,13 @@ public class KafkaReader extends AbstractMessageQueueReader {
     config.put("bootstrap.servers", kafkaBootstrapList);
     config.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
     config.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-    config.put("auto.offset.reset", "earliest");
-    config.put("group.id", UUID.randomUUID().toString());
+    config.put("auto.offset.reset", getConfiguration().getStartOffset().name());
+    config.put("group.id", getConfiguration().getGroup());
 
     config.putAll(getAdditionalKafkaProperties());
 
     kafkaConsumer = new KafkaConsumer<>(config);
-    kafkaConsumer.subscribe(Collections.singletonList(getTopic().toString()));
+    kafkaConsumer.subscribe(Collections.singletonList(getConfiguration().getTopic().toString()));
 
     log.trace("Opened Kafka kafkaConsumer using config " + config);
 

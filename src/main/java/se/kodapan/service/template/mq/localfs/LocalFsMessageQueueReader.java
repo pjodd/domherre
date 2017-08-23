@@ -2,6 +2,7 @@ package se.kodapan.service.template.mq.localfs;
 
 import se.kodapan.service.template.mq.MessageQueueConsumer;
 import se.kodapan.service.template.mq.MessageQueueReader;
+import se.kodapan.service.template.mq.MessageQueueReaderConfiguration;
 import se.kodapan.service.template.mq.MessageQueueTopic;
 
 /**
@@ -11,12 +12,12 @@ import se.kodapan.service.template.mq.MessageQueueTopic;
 public class LocalFsMessageQueueReader implements MessageQueueReader {
 
   private LocalFsMessageQueue queue;
-  private MessageQueueTopic topic;
+  private MessageQueueReaderConfiguration configuration;
   private MessageQueueConsumer consumer;
 
-  public LocalFsMessageQueueReader(LocalFsMessageQueue queue, MessageQueueTopic topic, MessageQueueConsumer consumer) {
+  public LocalFsMessageQueueReader(LocalFsMessageQueue queue, MessageQueueReaderConfiguration configuration, MessageQueueConsumer consumer) {
     this.queue = queue;
-    this.topic = topic;
+    this.configuration = configuration;
     this.consumer = consumer;
   }
 
@@ -33,8 +34,8 @@ public class LocalFsMessageQueueReader implements MessageQueueReader {
   }
 
   @Override
-  public MessageQueueTopic getTopic() {
-    return topic;
+  public MessageQueueReaderConfiguration getConfiguration() {
+    return configuration;
   }
 
   @Override

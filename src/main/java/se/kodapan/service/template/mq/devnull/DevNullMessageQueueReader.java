@@ -2,6 +2,7 @@ package se.kodapan.service.template.mq.devnull;
 
 import se.kodapan.service.template.mq.MessageQueueConsumer;
 import se.kodapan.service.template.mq.MessageQueueReader;
+import se.kodapan.service.template.mq.MessageQueueReaderConfiguration;
 import se.kodapan.service.template.mq.MessageQueueTopic;
 
 /**
@@ -10,11 +11,11 @@ import se.kodapan.service.template.mq.MessageQueueTopic;
  */
 public class DevNullMessageQueueReader implements MessageQueueReader {
 
-  private MessageQueueTopic topic;
+  private MessageQueueReaderConfiguration configuration;
   private MessageQueueConsumer consumer;
 
-  public DevNullMessageQueueReader(MessageQueueTopic topic, MessageQueueConsumer consumer) {
-    this.topic = topic;
+  public DevNullMessageQueueReader(MessageQueueReaderConfiguration configuration, MessageQueueConsumer consumer) {
+    this.configuration = configuration;
     this.consumer = consumer;
   }
 
@@ -29,8 +30,8 @@ public class DevNullMessageQueueReader implements MessageQueueReader {
   }
 
   @Override
-  public MessageQueueTopic getTopic() {
-    return topic;
+  public MessageQueueReaderConfiguration getConfiguration() {
+    return configuration;
   }
 
   @Override

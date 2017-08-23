@@ -18,7 +18,7 @@ public class RamQueueWriter implements MessageQueueWriter {
 
   @Override
   public void write(MessageQueueTopic topic, MessageQueueMessage message) throws Exception {
-    ramMessageQueue.getQueueByTopic(topic).add(message);
+    ramMessageQueue.queueMessage(topic, message);
   }
 
   @Override
