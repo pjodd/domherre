@@ -11,25 +11,28 @@ import java.util.UUID;
 @Data
 public class MessageQueueReaderConfiguration {
 
-  public enum StartOffset {
+  public enum AutoOffsetReset {
     earliest,
     latest
   }
 
-  private StartOffset startOffset = StartOffset.earliest;
+  /**
+   * Where to start accessing first time reader with the given groups is created.
+   * I.e. at start or at end of queue
+   */
+  private AutoOffsetReset autoOffsetReset = AutoOffsetReset.earliest;
   
   private String group = UUID.randomUUID().toString();
 
   private MessageQueueTopic topic;
 
-
   public MessageQueueReaderConfiguration(MessageQueueTopic topic) {
     this.topic = topic;
   }
 
-  public MessageQueueReaderConfiguration(MessageQueueTopic topic, StartOffset startOffset, String group) {
+  public MessageQueueReaderConfiguration(MessageQueueTopic topic, AutoOffsetReset autoOffsetReset, String group) {
     this.topic = topic;
-    this.startOffset = startOffset;
+    this.autoOffsetReset = autoOffsetReset;
     this.group = group;
   }
 }

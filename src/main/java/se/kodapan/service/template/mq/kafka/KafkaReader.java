@@ -13,7 +13,6 @@ import se.kodapan.service.template.util.Environment;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Properties;
-import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -47,7 +46,15 @@ public class KafkaReader extends AbstractMessageQueueReader {
     config.put("bootstrap.servers", kafkaBootstrapList);
     config.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
     config.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-    config.put("auto.offset.reset", getConfiguration().getStartOffset().name());
+
+    if (MessageQueueReaderConfiguration.AutoOffsetReset.earliest.equals(getConfiguration().getAutoOffsetReset())) {
+      config.put("auto.offset.reset", "earliest");
+    } else if (MessageQueueReaderConfiguration.AutoOffsetReset.latest.equals(getConfiguration().getAutoOffsetReset())) {
+      config.put("auto.offset.reset", "latest");
+    } else {
+      throw new UnsupportedOperationException();
+    }
+
     config.put("group.id", getConfiguration().getGroup());
 
     config.putAll(getAdditionalKafkaProperties());

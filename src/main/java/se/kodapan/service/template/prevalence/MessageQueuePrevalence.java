@@ -80,7 +80,7 @@ public class MessageQueuePrevalence implements Initializable {
     }
     log.info("Bound " + eventSourceBindings.size() + " transaction classes in classpath.");
 
-    journalReader = journalFactory.readerFactory(new MessageQueueReaderConfiguration(eventSourceTopic, MessageQueueReaderConfiguration.StartOffset.earliest, UUID.randomUUID().toString()), new MessageQueueConsumer() {
+    journalReader = journalFactory.readerFactory(new MessageQueueReaderConfiguration(eventSourceTopic, MessageQueueReaderConfiguration.AutoOffsetReset.earliest, UUID.randomUUID().toString()), new MessageQueueConsumer() {
       @Override
       public void consume(MessageQueueMessage message) {
 

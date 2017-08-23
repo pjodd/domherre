@@ -47,8 +47,8 @@ public class RamMessageQueue {
   public ConcurrentLinkedQueue<MessageQueueMessage> registerQueue(MessageQueueReaderConfiguration configuration) {
     synchronized (queuesByTopic) {
       if (queuesByTopic.containsKey(configuration.getTopic())
-          && !MessageQueueReaderConfiguration.StartOffset.latest.equals(configuration.getStartOffset())) {
-        throw new UnsupportedOperationException("StartOffset must be latest");
+          && !MessageQueueReaderConfiguration.AutoOffsetReset.latest.equals(configuration.getAutoOffsetReset())) {
+        throw new UnsupportedOperationException("AutoOffsetReset must be latest");
       }
       // todo group
       ConcurrentLinkedQueue<MessageQueueMessage> queue = new ConcurrentLinkedQueue<>();
