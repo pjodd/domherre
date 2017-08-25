@@ -1,0 +1,5 @@
+plugins {
+  id 'net.franz-becker.gradle-lombok' version '1.5'
+}
+
+description = 'domain'

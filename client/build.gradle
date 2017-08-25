@@ -1,0 +1,15 @@
+plugins {
+  id 'net.franz-becker.gradle-lombok' version '1.5'
+}
+
+description = 'client'
+
+dependencies {
+  compile project(':domain')
+}
+
+repositories {
+  mavenLocal()
+  maven { url "http://repo.maven.apache.org/maven2" }
+}
+

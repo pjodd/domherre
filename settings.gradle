@@ -1,0 +1,8 @@
+rootProject.name = 'parent'
+include ':domain'
+include ':server'
+include ':client'
+
+project(':domain').projectDir = "$rootDir/domain" as File
+project(':server').projectDir = "$rootDir/server" as File
+project(':client').projectDir = "$rootDir/client" as File
