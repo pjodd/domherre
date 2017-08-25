@@ -4,19 +4,27 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>se.kodapan.java-service-template</groupId>
-  <artifactId>parent</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <packaging>pom</packaging>
-  <name>java-service-template parent</name>
+  <parent>
+    <groupId>se.kodapan.java-service-template</groupId>
+    <artifactId>parent</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+  </parent>
+  <artifactId>client</artifactId>
 
-  <modules>
-    <module>domain</module>
-    <module>server</module>
-    <module>client</module>
-  </modules>
+  <packaging>jar</packaging>
+  <name>java-service-template client</name>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
 
   <dependencies>
+
+    <dependency>
+      <groupId>se.kodapan.java-service-template</groupId>
+      <artifactId>domain</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+    </dependency>
 
     <dependency>
       <groupId>org.projectlombok</groupId>
@@ -32,12 +40,6 @@
     </dependency>
 
     <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <version>1.0.13</version>
-    </dependency>
-
-    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.10</version>
@@ -47,8 +49,6 @@
   </dependencies>
 
   <build>
-    <pluginManagement>
-
     <plugins>
 
       <plugin>
@@ -78,9 +78,6 @@
       </plugin>
 
     </plugins>
-    
-    </pluginManagement>
-
   </build>
 
 </project>
