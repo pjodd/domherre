@@ -7,6 +7,7 @@ buildscript {
 allprojects  {
   apply plugin: 'maven'
 
+  /* Override group and version in parent-build.gradle, don't edit it here! */
   group = 'se.kodapan.java-service-template'
   version = '0.0.1-SNAPSHOT'
 
