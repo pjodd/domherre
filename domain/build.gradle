@@ -1,5 +1,9 @@
+/* Template file, do not edit. Use domain-build.gradle */
+
 plugins {
   id 'net.franz-becker.gradle-lombok' version '1.5'
 }
 
 description = 'domain'
+
+apply from: 'domain-build.gradle'

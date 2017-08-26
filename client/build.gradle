@@ -1,3 +1,5 @@
+/* Template file, do not edit. Use client-build.gradle */
+
 plugins {
   id 'net.franz-becker.gradle-lombok' version '1.5'
 }
@@ -8,8 +10,4 @@ dependencies {
   compile project(':domain')
 }
 
-repositories {
-  mavenLocal()
-  maven { url "http://repo.maven.apache.org/maven2" }
-}
-
+apply from: 'client-build.gradle'

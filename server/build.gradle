@@ -1,3 +1,5 @@
+/* Template file, do not edit. Use server-build.gradle */
+
 plugins {
   id 'net.franz-becker.gradle-lombok' version '1.5'
 }
@@ -16,10 +18,7 @@ dependencies {
   compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version:'2.6.4'
   compile group: 'org.apache.kafka', name: 'kafka-clients', version:'0.10.1.1'
   compile group: 'commons-logging', name: 'commons-logging-api', version:'1.1'
+  compile group: 'ch.qos.logback', name: 'logback-classic', version:'1.0.13'
 }
 
-repositories {
-  mavenLocal()
-  maven { url "http://repo.maven.apache.org/maven2" }
-}
-
+apply from: 'server-build.gradle'
