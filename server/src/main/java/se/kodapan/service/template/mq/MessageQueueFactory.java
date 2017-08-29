@@ -10,4 +10,7 @@ public interface MessageQueueFactory {
 
   public abstract MessageQueueWriter writerFactory();
 
+  /** @return Offset of message at end of queue */
+  public abstract long getQueueEndOffset(MessageQueueTopic topic);
+
 }

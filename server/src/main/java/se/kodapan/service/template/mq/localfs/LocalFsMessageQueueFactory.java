@@ -46,6 +46,11 @@ public class LocalFsMessageQueueFactory implements MessageQueueFactory, Initiali
     return new LocalFsMessageQueueWriter(messageQueue);
   }
 
+  @Override
+  public long getQueueEndOffset(MessageQueueTopic topic) {
+    throw new UnsupportedOperationException();
+  }
+
 }
 
 

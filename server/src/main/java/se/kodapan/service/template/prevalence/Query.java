@@ -3,6 +3,8 @@ package se.kodapan.service.template.prevalence;
 import java.time.OffsetDateTime;
 
 /**
+ * It is not possible to execute a Transaction from within a Query.
+ *
  * @author kalle
  * @since 2017-02-12 22:07
  */

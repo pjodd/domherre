@@ -139,4 +139,12 @@ public class KafkaReader extends AbstractMessageQueueReader {
 
   }
 
+  @Override
+  public boolean seek(long offset) {
+    throw new UnsupportedOperationException();
+  }
+
+  public Consumer<String, String> getKafkaConsumer() {
+    return kafkaConsumer;
+  }
 }

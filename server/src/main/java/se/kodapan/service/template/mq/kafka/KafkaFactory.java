@@ -3,7 +3,16 @@ package se.kodapan.service.template.mq.kafka;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.apache.kafka.clients.consumer.ConsumerRebalanceListener;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.TopicPartition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import se.kodapan.service.template.mq.*;
+import se.kodapan.service.template.util.Environment;
+
+import java.util.*;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * @author kalle
@@ -11,6 +20,7 @@ import se.kodapan.service.template.mq.*;
  */
 @Singleton
 public class KafkaFactory implements MessageQueueFactory {
+
 
   @Inject
   private ObjectMapper objectMapper;
@@ -24,4 +34,16 @@ public class KafkaFactory implements MessageQueueFactory {
   public MessageQueueWriter writerFactory() {
     return new KafkaWriter(objectMapper);
   }
+
+  @Override
+  public long getQueueEndOffset(MessageQueueTopic topic) {
+
+    try {
+      return new KafkaGetQueueEndOffset(topic).execute();
+    } catch (InterruptedException ie) {
+      throw new RuntimeException(ie);
+    }
+
+  }
+
 }

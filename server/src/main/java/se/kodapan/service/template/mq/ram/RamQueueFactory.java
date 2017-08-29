@@ -27,4 +27,10 @@ public class RamQueueFactory implements MessageQueueFactory {
   public MessageQueueWriter writerFactory() {
     return new RamQueueWriter(ramMessageQueue);
   }
+
+  @Override
+  public long getQueueEndOffset(MessageQueueTopic topic) {
+    throw new UnsupportedOperationException();
+  }
+
 }

@@ -80,6 +80,13 @@ public class MessageQueuePrevalence implements Initializable {
     }
     log.info("Bound " + eventSourceBindings.size() + " transaction classes in classpath.");
 
+    // todo find end position of queue
+    // todo replay from start
+    // todo wait for end to be reached until service is returned as opened
+
+    CountDownLatch startedSignal = new CountDownLatch(1);
+
+
     journalReader = journalFactory.readerFactory(new MessageQueueReaderConfiguration(eventSourceTopic, MessageQueueReaderConfiguration.AutoOffsetReset.earliest, UUID.randomUUID().toString()), new MessageQueueConsumer() {
       @Override
       public void consume(MessageQueueMessage message) {
@@ -132,6 +139,8 @@ public class MessageQueuePrevalence implements Initializable {
       log.error("Unable to open journal reader");
       return false;
     }
+
+    startedSignal.await();
 
     journalWriter = journalFactory.writerFactory();
     if (!journalWriter.open()) {

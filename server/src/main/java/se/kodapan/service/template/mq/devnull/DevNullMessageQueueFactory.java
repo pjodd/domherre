@@ -20,4 +20,9 @@ public class DevNullMessageQueueFactory implements MessageQueueFactory {
   public MessageQueueWriter writerFactory() {
     return new DevNullMessageQueueWriter();
   }
+
+  @Override
+  public long getQueueEndOffset(MessageQueueTopic topic) {
+    throw new UnsupportedOperationException();
+  }
 }

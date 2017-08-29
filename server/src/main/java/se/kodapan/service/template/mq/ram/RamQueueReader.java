@@ -97,4 +97,10 @@ public class RamQueueReader extends AbstractMessageQueueReader {
     }
 
   }
+
+  @Override
+  public boolean seek(long offset) {
+    throw new UnsupportedOperationException();
+  }
+
 }

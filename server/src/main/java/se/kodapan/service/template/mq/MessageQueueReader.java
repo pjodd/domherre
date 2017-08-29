@@ -12,5 +12,6 @@ public interface MessageQueueReader extends Initializable {
 
   public abstract MessageQueueConsumer getConsumer();
 
+  public abstract boolean seek(long offset);
 
 }

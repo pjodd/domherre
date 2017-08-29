@@ -42,4 +42,10 @@ public class LocalFsMessageQueueReader implements MessageQueueReader {
   public MessageQueueConsumer getConsumer() {
     return consumer;
   }
+
+  @Override
+  public boolean seek(long offset) {
+    throw new UnsupportedOperationException();
+  }
+
 }
