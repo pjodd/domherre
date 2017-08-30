@@ -33,10 +33,15 @@ public class Service {
     this.serviceName = serviceName;
   }
 
+  @Getter
   private Injector injector;
 
   public void run() {
     injector.getInstance(Run.class).start();
+  }
+
+  public void stop() {
+    injector.getInstance(Run.class).stop();
   }
 
   public boolean open() throws Exception {
@@ -96,15 +101,23 @@ public class Service {
 
   public boolean close() throws Exception {
 
-//    // todo retry for a while if unable
-//    for (Initializable initializable : serviceModule.getInitializables()) {
-//      if (!initializable.close()) {
-//        log.error("Unable to close " + initializable.toString());
-//        return false;
-//      }
-//    }
+    List<Initializable> notClosedInitializables = new ArrayList<>();
+    for (Class<? extends Initializable> initializableClass : getInitializables()) {
+      notClosedInitializables.add(injector.getInstance(initializableClass));
+    }
 
-    return true;
+    //    // todo retry for a while if unable
+
+    boolean success = true;
+
+    for (Initializable initializable : notClosedInitializables) {
+      if (!initializable.close()) {
+        log.error("Unable to close " + initializable.toString());
+        success = false;
+      }
+    }
+
+    return success;
   }
 
   public List<Class<? extends Initializable>> getInitializables() {
@@ -114,4 +127,6 @@ public class Service {
   public List<Module> getModules() {
     return Collections.emptyList();
   }
+
+
 }

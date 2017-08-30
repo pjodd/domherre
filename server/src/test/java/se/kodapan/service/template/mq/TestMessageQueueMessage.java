@@ -27,7 +27,7 @@ public class TestMessageQueueMessage {
         "}" +
         "}";
 
-    ObjectMapper objectMapper = Guice.createInjector(new ServiceModule("test")).getInstance(ObjectMapper.class);
+    ObjectMapper objectMapper = Guice.createInjector(new ServiceModule("test-" + System.currentTimeMillis())).getInstance(ObjectMapper.class);
 
     MessageQueueMessage message1 = objectMapper.readValue(json, MessageQueueMessage.class);
     MessageQueueMessage message2 = objectMapper.readValue(json, MessageQueueMessage.class);

@@ -28,7 +28,7 @@ public class KafkaReader extends AbstractMessageQueueReader {
   private Poller poller;
   private Consumer<String, String> kafkaConsumer;
 
-  private String kafkaBootstrapList = Environment.getValue("kafka.bootstrap.servers", "172.16.61.129:9092");
+  private String kafkaBootstrapList = Environment.getValue("kafka.bootstrap.servers", "localhost:9092");
 
   private Map<String, String> getAdditionalKafkaProperties() {
     return Collections.EMPTY_MAP;
@@ -44,9 +44,10 @@ public class KafkaReader extends AbstractMessageQueueReader {
     Properties config = new Properties();
 
     config.put("bootstrap.servers", kafkaBootstrapList);
+    
     config.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
     config.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-
+    
     if (MessageQueueReaderConfiguration.AutoOffsetReset.earliest.equals(getConfiguration().getAutoOffsetReset())) {
       config.put("auto.offset.reset", "earliest");
     } else if (MessageQueueReaderConfiguration.AutoOffsetReset.latest.equals(getConfiguration().getAutoOffsetReset())) {
@@ -107,6 +108,8 @@ public class KafkaReader extends AbstractMessageQueueReader {
       stopSignal = new AtomicBoolean(false);
       doneSignal = new CountDownLatch(1);
       try {
+        MessageQueueConsumerContext consumerContext = new MessageQueueConsumerContext();
+        consumerContext.setTopic(getConfiguration().getTopic());
         while (!stopSignal.get()) {
           try {
             if (getConsumer() == null) {
@@ -119,7 +122,9 @@ public class KafkaReader extends AbstractMessageQueueReader {
                 for (ConsumerRecord<String, String> record : records) {
                   MessageQueueMessage message = getObjectMapper().readValue(record.value(), MessageQueueMessage.class);
                   try {
-                    getConsumer().consume(message);
+                    // consumerContext.setTopic(record.topic()); in case we allow multiple topics on the same consumer
+                    consumerContext.setOffset(record.offset());
+                    getConsumer().consume(message, consumerContext);
                   } catch (Exception e) {
                     log.error("Exception while consuming message\n" + message, e);
                   }

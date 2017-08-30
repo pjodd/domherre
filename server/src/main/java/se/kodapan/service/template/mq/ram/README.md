@@ -1,1 +1,0 @@
-A transient in RAM message queue, mainly used for test cases.

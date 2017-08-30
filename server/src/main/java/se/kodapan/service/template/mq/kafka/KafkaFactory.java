@@ -40,7 +40,7 @@ public class KafkaFactory implements MessageQueueFactory {
 
     try {
       return new KafkaGetQueueEndOffset(topic).execute();
-    } catch (InterruptedException ie) {
+    } catch (Exception ie) {
       throw new RuntimeException(ie);
     }
 

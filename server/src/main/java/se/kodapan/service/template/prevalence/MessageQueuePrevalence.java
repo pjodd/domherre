@@ -80,60 +80,75 @@ public class MessageQueuePrevalence implements Initializable {
     }
     log.info("Bound " + eventSourceBindings.size() + " transaction classes in classpath.");
 
-    // todo find end position of queue
-    // todo replay from start
-    // todo wait for end to be reached until service is returned as opened
+    // find end position of queue
+    // replay from start
+    // wait for end to be reached until service is returned as opened
 
-    CountDownLatch startedSignal = new CountDownLatch(1);
+    long endPosition = journalFactory.getQueueEndOffset(eventSourceTopic);
+    CountDownLatch startedSignal = new CountDownLatch(endPosition == 0 ? 0 : 1);
 
+    journalReader = journalFactory.readerFactory(
+        new MessageQueueReaderConfiguration(
+            eventSourceTopic,
+            MessageQueueReaderConfiguration.AutoOffsetReset.earliest,
+            UUID.randomUUID().toString()
+        ),
+        new MessageQueueConsumer() {
 
-    journalReader = journalFactory.readerFactory(new MessageQueueReaderConfiguration(eventSourceTopic, MessageQueueReaderConfiguration.AutoOffsetReset.earliest, UUID.randomUUID().toString()), new MessageQueueConsumer() {
-      @Override
-      public void consume(MessageQueueMessage message) {
-
-        log.debug("Incoming message " + message);
-
-        AwaitedTransactionExecution awaitedTransactionExecution = awaitedTransactionExecutions.get(message.getIdentity());
-        try {
-
-          EventSourceBinding binding = findBinding(message.getStereotype(), message.getVersion());
-
-          if (binding == null) {
-            log.error("No binding for event\n" + message);
-
-          } else {
-
-            Object payload;
-            Transaction transaction;
-            try {
-              payload = objectMapper.readValue(objectMapper.writeValueAsString(message.getPayload()), binding.getPayloadClass());
-              transaction = binding.getTransactionClass().newInstance();
-            } catch (Exception e) {
-              log.error("Exception while preparing to execute transaction", e);
-              return;
+          @Override
+          public void consume(MessageQueueMessage message, MessageQueueConsumerContext context) {
+            
+            if (log.isDebugEnabled()) {
+              log.debug("Consuming {} {}", message, context);
             }
+
+            AwaitedTransactionExecution awaitedTransactionExecution = awaitedTransactionExecutions.get(message.getIdentity());
             try {
-              Object response = prevalence.execute(transaction, payload, message.getCreated());
-              if (awaitedTransactionExecution != null) {
-                awaitedTransactionExecution.setTransactionResponse(response);
-                awaitedTransactionExecution.setExecuted(OffsetDateTime.now());
+
+              EventSourceBinding binding = findBinding(message.getStereotype(), message.getVersion());
+
+              if (binding == null) {
+                log.error("No binding for event\n" + message);
+
+              } else {
+
+                Object payload;
+                Transaction transaction;
+                try {
+                  payload = objectMapper.readValue(objectMapper.writeValueAsString(message.getPayload()), binding.getPayloadClass());
+                  transaction = binding.getTransactionClass().newInstance();
+                } catch (Exception e) {
+                  log.error("Exception while preparing to execute transaction", e);
+                  return;
+                }
+                try {
+                  Object response = prevalence.execute(transaction, payload, message.getCreated());
+                  if (awaitedTransactionExecution != null) {
+                    awaitedTransactionExecution.setTransactionResponse(response);
+                    awaitedTransactionExecution.setExecuted(OffsetDateTime.now());
+                  }
+                } catch (Exception e) {
+                  log.error("Exception while executing transaction", e);
+                  if (awaitedTransactionExecution != null) {
+                    awaitedTransactionExecution.setTransactionExecutionException(e);
+                  }
+                }
+
               }
-            } catch (Exception e) {
-              log.error("Exception while executing transaction", e);
+            } finally {
               if (awaitedTransactionExecution != null) {
-                awaitedTransactionExecution.setTransactionExecutionException(e);
+                awaitedTransactionExecution.getDoneSignal().countDown();
+                awaitedTransactionExecutions.remove(message.getIdentity());
+              }
+
+              if (startedSignal.getCount() > 0
+                  && context.getOffset() >= endPosition -1) { // todo really -1?
+                startedSignal.countDown();
               }
             }
 
           }
-        } finally {
-          if (awaitedTransactionExecution != null) {
-            awaitedTransactionExecution.getDoneSignal().countDown();
-            awaitedTransactionExecutions.remove(message.getIdentity());
-          }
-        }
-      }
-    });
+        });
 
     if (!journalReader.open()) {
       log.error("Unable to open journal reader");
@@ -141,6 +156,7 @@ public class MessageQueuePrevalence implements Initializable {
     }
 
     startedSignal.await();
+    log.info("Prevalence journal {} replayed from beginning to known end", eventSourceTopic.toString());
 
     journalWriter = journalFactory.writerFactory();
     if (!journalWriter.open()) {
@@ -187,7 +203,6 @@ public class MessageQueuePrevalence implements Initializable {
   }
 
 
-
   @Data
   private static class AwaitedTransactionExecution {
     private UUID messageIdentity;
@@ -204,7 +219,7 @@ public class MessageQueuePrevalence implements Initializable {
 
   /**
    * Executes and waits for response using a future.
-   *
+   * <p>
    * If you don't care about the response use {@link #send(Class, Object)} instead to save system resources.
    *
    * @param transactionClass

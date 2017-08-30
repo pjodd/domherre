@@ -1,4 +1,4 @@
-package se.kodapan.service;
+package se.kodapan.service.template;
 
 import com.google.inject.Binder;
 import com.google.inject.Module;
@@ -6,11 +6,8 @@ import com.google.inject.name.Names;
 import junit.framework.Assert;
 import lombok.Data;
 import org.junit.Test;
-import se.kodapan.service.template.Initializable;
-import se.kodapan.service.template.Service;
-import se.kodapan.service.template.ServiceModule;
 import se.kodapan.service.template.mq.MessageQueueFactory;
-import se.kodapan.service.template.mq.ram.RamQueueFactory;
+import se.kodapan.service.template.mq.kafka.KafkaFactory;
 import se.kodapan.service.template.prevalence.MessageQueuePrevalence;
 import se.kodapan.service.template.prevalence.PrevalenceModule;
 
@@ -19,16 +16,18 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * Just starts it up and close it down.
+ *
  * @author kalle
  * @since 2017-03-07 22:06
  */
-public class TestService {
+public class TestService extends ServiceTest {
 
   @Test
   public void test() throws Exception {
 
 
-    Service service = new Service("test") {
+    Service service = new Service("test-" + System.currentTimeMillis()) {
 
       @Override
       public List<Class<? extends Initializable>> getInitializables() {
@@ -38,12 +37,7 @@ public class TestService {
       @Override
       public List<Module> getModules() {
         List<Module> modules = new ArrayList<>();
-        modules.add(new PrevalenceModule(Root.class, getServiceName()) {
-          @Override
-          public void configure(Binder binder) {
-            binder.bind(MessageQueueFactory.class).annotatedWith(Names.named(PrevalenceModule.PREVALENCE_JOURNAL_FACTORY)).to(RamQueueFactory.class);
-          }
-        });
+        modules.add(new PrevalenceModule(Root.class, getServiceName()));
         return modules;
       }
     };

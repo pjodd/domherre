@@ -1,18 +1,16 @@
 package se.kodapan.service.template.prevalence;
 
-import com.google.inject.Binder;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
 import com.google.inject.Module;
-import com.google.inject.name.Names;
 import junit.framework.Assert;
 import lombok.Data;
 import org.junit.Test;
-import se.kodapan.service.template.ServiceModule;
-import se.kodapan.service.template.mq.MessageQueueFactory;
-import se.kodapan.service.template.mq.ram.RamQueueFactory;
+import se.kodapan.service.template.Initializable;
+import se.kodapan.service.template.Service;
+import se.kodapan.service.template.ServiceTest;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -20,31 +18,76 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author kalle
  * @since 2017-02-17 15:45
  */
-public class TestMessageQueuePrevalence {
+public class TestMessageQueuePrevalence extends ServiceTest {
 
   @Test
   public void test() throws Exception {
 
-    List<Module> modules = new ArrayList<>();
-    modules.add(new ServiceModule("test"));
-    modules.add(new PrevalenceModule(Root.class, "test") {
-      @Override
-      public void configure(Binder binder) {
-        binder.bind(MessageQueueFactory.class).annotatedWith(Names.named(PrevalenceModule.PREVALENCE_JOURNAL_FACTORY)).to(RamQueueFactory.class);
-      }
-    });
-    Injector injector = Guice.createInjector(modules);
+    String serviceName = "test-" + System.currentTimeMillis();
 
-    Prevalence prevalence = injector.getInstance(Prevalence.class);
-    MessageQueuePrevalence messageQueuePrevalence = injector.getInstance(MessageQueuePrevalence.class);
-    Assert.assertTrue(messageQueuePrevalence.open());
+    // first run, execute a bunch of transactions.
 
-    Assert.assertEquals(2, messageQueuePrevalence.execute(TestTransaction.class, new Payload(2)).get().getSum());
-    Assert.assertEquals(3, messageQueuePrevalence.execute(TestTransaction.class, new Payload(1)).get().getSum());
+    Service service = serviceFactory(serviceName);
 
-    System.currentTimeMillis();
+    Assert.assertTrue(service.open());
+    try {
+      
+      Prevalence prevalence = service.getInjector().getInstance(Prevalence.class);
+      MessageQueuePrevalence messageQueuePrevalence = service.getInjector().getInstance(MessageQueuePrevalence.class);
+
+      Assert.assertEquals(2, messageQueuePrevalence.execute(TestTransaction.class, new Payload(2)).get().getSum());
+      Assert.assertEquals(3, messageQueuePrevalence.execute(TestTransaction.class, new Payload(1)).get().getSum());
+
+      Assert.assertEquals(3, prevalence.execute(new Query<Root, Integer>() {
+        @Override
+        public Integer execute(Root root, OffsetDateTime date) throws Exception {
+          return root.getCounter().get();
+        }
+      }).intValue());
 
 
+    } finally {
+      Assert.assertTrue(service.close());
+    }
+
+    // second run, start up again and reload journal
+
+    service = serviceFactory(serviceName);
+    try {
+      Assert.assertTrue(service.open());
+
+      Prevalence prevalence = service.getInjector().getInstance(Prevalence.class);
+      MessageQueuePrevalence messageQueuePrevalence = service.getInjector().getInstance(MessageQueuePrevalence.class);
+
+      Assert.assertEquals(3, prevalence.execute(new Query<Root, Integer>() {
+        @Override
+        public Integer execute(Root root, OffsetDateTime date) throws Exception {
+          return root.getCounter().get();
+        }
+      }).intValue());
+
+    } finally {
+      Assert.assertTrue(service.close());
+    }
+
+
+  }
+
+  private Service serviceFactory(final String serviceName) {
+    return new Service(serviceName) {
+
+        @Override
+        public List<Class<? extends Initializable>> getInitializables() {
+          return Collections.singletonList(MessageQueuePrevalence.class);
+        }
+
+        @Override
+        public List<Module> getModules() {
+          List<Module> modules = new ArrayList<>();
+          modules.add(new PrevalenceModule(Root.class, getServiceName()));
+          return modules;
+        }
+      };
   }
 
   @Data

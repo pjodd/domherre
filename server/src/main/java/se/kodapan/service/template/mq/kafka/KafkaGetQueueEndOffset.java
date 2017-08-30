@@ -2,16 +2,17 @@ package se.kodapan.service.template.mq.kafka;
 
 import org.apache.kafka.clients.consumer.ConsumerRebalanceListener;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.PartitionInfo;
 import org.apache.kafka.common.TopicPartition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.kodapan.service.template.mq.MessageQueueTopic;
 import se.kodapan.service.template.util.Environment;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * @author kalle
@@ -21,7 +22,7 @@ public class KafkaGetQueueEndOffset {
 
   private Logger log = LoggerFactory.getLogger(getClass());
 
-  private String kafkaBootstrapList = Environment.getValue("kafka.bootstrap.servers", "172.16.61.129:9092");
+  private String kafkaBootstrapList = Environment.getValue("kafka.bootstrap.servers", "localhost:9092");
 
   private CountDownLatch endLatch = new CountDownLatch(1);
   private long startOffset = -1;
@@ -33,7 +34,7 @@ public class KafkaGetQueueEndOffset {
     this.topic = topic;
   }
 
-  public long execute() throws InterruptedException {
+  public long execute() throws InterruptedException, TimeoutException {
 
     Properties config = new Properties();
 
@@ -41,9 +42,9 @@ public class KafkaGetQueueEndOffset {
     config.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
     config.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
 
-    config.put("auto.offset.reset", "latest");
+    config.put("auto.offset.reset", "earliest");
 
-    config.put("group.id", "kafka-factory-get-end-offset");
+    config.put("group.id", UUID.randomUUID().toString());
 
     KafkaConsumer kafkaConsumer = new KafkaConsumer<>(config);
 
@@ -52,13 +53,13 @@ public class KafkaGetQueueEndOffset {
       @Override
       public void onPartitionsAssigned(Collection<TopicPartition> partitions) {
         // if latch is down and should just continue
-        if(endLatch.getCount() == 0) {
+        if (endLatch.getCount() == 0) {
           return;
         }
         // There will only ever be one partition here
         TopicPartition tp = partitions.iterator().next();
         long pos = kafkaConsumer.position(tp);
-        if(startOffset == -1) {
+        if (startOffset == -1) {
           log.debug("Found Kafka start position {} for {}", pos, tp);
           startOffset = pos;
         } else {
@@ -67,28 +68,34 @@ public class KafkaGetQueueEndOffset {
         kafkaConsumer.seekToEnd(Collections.singletonList(tp));
         endOffset = kafkaConsumer.position(tp);
         log.debug("Found end position {} for {}", endOffset, tp);
-        log.debug("Seeking to position {} for {}", startOffset, tp);
-        kafkaConsumer.seek(tp, startOffset);
-        // Check that this is not an empty topic
-        if(endOffset <= 1) {
-          endLatch.countDown();
-        }
+        endLatch.countDown();
       }
 
       @Override
-      public void onPartitionsRevoked(Collection<TopicPartition> partitions) { }
+      public void onPartitionsRevoked(Collection<TopicPartition> partitions) {
+      }
 
     };
 
     kafkaConsumer.subscribe(Collections.singletonList(topic.toString()), consumerRebalanceListener);
 
-    log.trace("Opened Kafka kafkaConsumer to get end offset using config " + config);
+    if (log.isTraceEnabled()) {
+      log.trace("Opened Kafka kafkaConsumer to get end offset using config {}", config);
+    }
 
-    endLatch.await();
+    kafkaConsumer.poll(0); // trigger consumerRebalanceListener
 
-    kafkaConsumer.close();
-
-    return endOffset;
+    try {
+      // one minute might actually be way too much
+      if (!endLatch.await(1, TimeUnit.MINUTES)) {
+        throw new TimeoutException("Timeout seeking to end offset of topic " + topic.toString());
+      } else {
+        log.trace("Found end offset of {} to be {}", topic.toString(), endOffset);
+        return endOffset;
+      }
+    } finally {
+      kafkaConsumer.close();
+    }
 
 
   }

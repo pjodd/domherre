@@ -6,6 +6,6 @@ package se.kodapan.service.template.mq;
  */
 public interface MessageQueueConsumer {
 
-  public abstract void consume(MessageQueueMessage message);
+  public abstract void consume(MessageQueueMessage message, MessageQueueConsumerContext context);
 
 }

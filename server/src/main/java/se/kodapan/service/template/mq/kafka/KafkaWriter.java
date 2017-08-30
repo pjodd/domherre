@@ -29,7 +29,7 @@ public class KafkaWriter implements MessageQueueWriter {
 
   private KafkaProducer<String, String> kafkaProducer;
 
-  private String kafkaBootstrapList = Environment.getValue("kafka.bootstrap.servers", "172.16.61.129:9092");
+  private String kafkaBootstrapList = Environment.getValue("kafka.bootstrap.servers", "localhost:9092");
 
   private Map<String, String> getAdditionalKafkaProperties() {
     return Collections.EMPTY_MAP;
@@ -47,7 +47,7 @@ public class KafkaWriter implements MessageQueueWriter {
     config.put("bootstrap.servers", getKafkaBootstrapList());
     config.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
     config.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-
+    
     config.putAll(getAdditionalKafkaProperties());
 
     kafkaProducer = new KafkaProducer<>(config);

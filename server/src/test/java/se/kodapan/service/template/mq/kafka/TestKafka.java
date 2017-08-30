@@ -6,9 +6,9 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import se.kodapan.service.template.ServiceModule;
+import se.kodapan.service.template.ServiceTest;
 import se.kodapan.service.template.mq.*;
 
 import java.time.OffsetDateTime;
@@ -18,14 +18,18 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+
 /**
+ * Just ensures that we can send and read messages sent on Kafka.
+ * Has nothing to do with Prevalence.
+ *
  * @author kalle
  * @since 2017-02-23 01:04
  */
-public class TestKafka {
+public class TestKafka extends ServiceTest {
+
 
   @Test
-  @Ignore
   public void test() throws Exception {
 
     long seed = System.currentTimeMillis();
@@ -47,14 +51,16 @@ public class TestKafka {
 
     final List<MessageQueueMessage> consumed = new ArrayList<>();
 
-    MessageQueueReader reader = factory.readerFactory(new MessageQueueReaderConfiguration(topic), new MessageQueueConsumer() {
-      @Override
-      public void consume(MessageQueueMessage message) {
-        Assert.assertTrue(TestKafka.equals(writtenMessages.poll(), message));
-        consumed.add(message);
-        System.out.println("in: " + message.toString());
-      }
-    });
+    MessageQueueReader reader = factory.readerFactory(
+        new MessageQueueReaderConfiguration(topic),
+        new MessageQueueConsumer() {
+          @Override
+          public void consume(MessageQueueMessage message, MessageQueueConsumerContext context) {
+            Assert.assertTrue(TestKafka.equals(writtenMessages.poll(), message));
+            consumed.add(message);
+            System.out.println("in: " + message.toString());
+          }
+        });
     Assert.assertTrue(reader.open());
 
     MessageQueueWriter writer = factory.writerFactory();
@@ -100,7 +106,7 @@ public class TestKafka {
         && m1.getIdentity().equals(m2.getIdentity())
         && m1.getStereotype().equals(m2.getStereotype())
         && m1.getVersion() == m2.getVersion())
-    ) {
+        ) {
       return false;
     }
     if (m1.getPayload() == null && m2.getPayload() == null) {
