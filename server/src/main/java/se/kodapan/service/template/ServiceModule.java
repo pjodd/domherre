@@ -13,6 +13,7 @@ import org.gwizard.web.WebConfig;
 import se.kodapan.service.template.util.Environment;
 
 import javax.inject.Singleton;
+import java.time.Clock;
 
 /**
  * @author kalle
@@ -61,5 +62,12 @@ public class ServiceModule implements Module {
     mapper.registerModule(new JavaTimeModule());
     return mapper;
   }
+
+  @Provides
+  @Singleton
+  public Clock clockFactory() {
+    return Clock.systemUTC();
+  }
+
 
 }
