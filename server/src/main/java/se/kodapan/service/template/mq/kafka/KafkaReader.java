@@ -124,6 +124,9 @@ public class KafkaReader extends AbstractMessageQueueReader {
                   try {
                     // consumerContext.setTopic(record.topic()); in case we allow multiple topics on the same consumer
                     consumerContext.setOffset(record.offset());
+                    if (log.isDebugEnabled()) {
+                      log.debug("Incoming message on topic {} {}", getConfiguration().getTopic(), message);
+                    }
                     getConsumer().consume(message, consumerContext);
                   } catch (Exception e) {
                     log.error("Exception while consuming message\n" + message, e);
