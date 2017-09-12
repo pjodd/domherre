@@ -15,13 +15,29 @@ public class Environment {
   public static void setDefaultValue(String key, String value) {
     defaultValues.put(key, value);
   }
-  
+
   public static String getValue(String key, String defaultValue) {
     String value = System.getenv(key);
     if (value == null) {
       value = defaultValues.get(key);
     }
     return value != null ? value : defaultValue;
+  }
+
+  public static Integer getValue(String key, Integer defaultValue) {
+    String value = System.getenv(key);
+    if (value == null) {
+      value = defaultValues.get(key);
+    }
+    return value != null ? Integer.valueOf(value) : defaultValue;
+  }
+
+  public static Boolean getValue(String key, Boolean defaultValue) {
+    String value = System.getenv(key);
+    if (value == null) {
+      value = defaultValues.get(key);
+    }
+    return value != null ? Boolean.valueOf(value) : defaultValue;
   }
 
 
