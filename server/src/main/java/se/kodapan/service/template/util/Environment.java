@@ -16,6 +16,14 @@ public class Environment {
     defaultValues.put(key, value);
   }
 
+  public static void setDefaultValue(String key, Integer value) {
+    defaultValues.put(key, String.valueOf(value));
+  }
+
+  public static void setDefaultValue(String key, Boolean value) {
+    defaultValues.put(key, String.valueOf(value));
+  }
+
   public static String getValue(String key, String defaultValue) {
     String value = System.getenv(key);
     if (value == null) {
