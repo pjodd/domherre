@@ -4,6 +4,10 @@ plugins {
   id 'net.franz-becker.gradle-lombok' version '1.5'
 }
 
+dependencies {
+  compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version:'2.8.6'
+}
+
 description = 'domain'
 
 apply from: 'domain-build.gradle'
