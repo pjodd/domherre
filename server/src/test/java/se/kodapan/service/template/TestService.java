@@ -10,10 +10,12 @@ import se.kodapan.service.template.mq.MessageQueueFactory;
 import se.kodapan.service.template.mq.kafka.KafkaFactory;
 import se.kodapan.service.template.prevalence.MessageQueuePrevalence;
 import se.kodapan.service.template.prevalence.PrevalenceModule;
+import se.kodapan.service.template.util.Environment;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Just starts it up and close it down.
@@ -26,6 +28,8 @@ public class TestService extends ServiceTest {
   @Test
   public void test() throws Exception {
 
+    int webConfigPort = 9000 + new Random().nextInt(1000);
+    Environment.setDefaultValue("webConfig.port", webConfigPort);
 
     Service service = new Service("test-" + System.currentTimeMillis()) {
 
@@ -44,15 +48,9 @@ public class TestService extends ServiceTest {
 
     Assert.assertTrue(service.open());
     try {
-
-
-      System.currentTimeMillis();
-
       service.run();
-//      while (true) {
-//        Thread.sleep(1000);
-//      }
-
+      // todo assert ping answers
+      service.stop();
     } finally {
       Assert.assertTrue(service.close());
     }

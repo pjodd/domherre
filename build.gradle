@@ -2,6 +2,9 @@
 
 buildscript {
   repositories { jcenter() }
+  dependencies {
+    classpath 'se.transmode.gradle:gradle-docker:1.2'
+  }
 }
 
 allprojects  {

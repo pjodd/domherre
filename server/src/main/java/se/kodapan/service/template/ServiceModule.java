@@ -41,7 +41,7 @@ public class ServiceModule implements Module {
 
 
   public int getServerPort() {
-    return 8080;
+    return Environment.getValue("webConfig.port", 8080);
   }
 
   @Singleton

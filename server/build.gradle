@@ -30,5 +30,24 @@ dependencies {
 
 }
 
+apply plugin: 'application'
+
+mainClassName = "se.kodapan.service.template.Main"
+
+apply plugin: 'docker'
+
+docker {
+  maintainer 'Kodapan "hej@kodapan.se"'
+}
+
+distDocker {
+  dependsOn('build')
+  tag = "registry.kodapan.se/{$rootProject.name}"
+  tagVersion = "latest"
+}
+
+
+
+
 
 apply from: 'server-build.gradle'
