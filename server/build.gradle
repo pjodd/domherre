@@ -21,7 +21,7 @@ dependencies {
   compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version:'2.6.4'
   compile group: 'org.apache.kafka', name: 'kafka-clients', version:'0.10.1.1'
   compile group: 'commons-logging', name: 'commons-logging-api', version:'1.1'
-  
+
   testCompile group: 'org.apache.kafka', name: 'kafka_2.12', version:'0.10.1.1'
   testCompile group: 'org.apache.curator', name: 'curator-test', version:'4.0.0'
 
@@ -41,9 +41,15 @@ docker {
   maintainer 'Kodapan "hej@kodapan.se"'
 }
 
+
+def tagMatcher = group.toString() =~ /^([^.]+(\.[^.]+)+)\.([^.]+)$/
+tagMatcher.find();
+def tagGroup = tagMatcher.group(1);
+def tagName = tagMatcher.group(3);
+
 distDocker {
   dependsOn('build')
-  tag = "registry.kodapan.se/$rootProject.name"
+  tag = "registry.kodapan.se/${tagGroup}/${tagName}"
   tagVersion = "latest"
 }
 
