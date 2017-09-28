@@ -37,6 +37,7 @@ mainClassName = "se.kodapan.service.template.Main"
 apply plugin: 'docker'
 
 docker {
+  baseimage 'aglover/java8-pier'
   maintainer 'Kodapan "hej@kodapan.se"'
 }
 
