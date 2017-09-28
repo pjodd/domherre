@@ -42,12 +42,8 @@ docker {
 
 distDocker {
   dependsOn('build')
-  tag = "registry.kodapan.se/{$rootProject.name}"
+  tag = "registry.kodapan.se/$rootProject.name"
   tagVersion = "latest"
 }
-
-
-
-
 
 apply from: 'server-build.gradle'
