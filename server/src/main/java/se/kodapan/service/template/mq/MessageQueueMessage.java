@@ -18,6 +18,8 @@ public class MessageQueueMessage {
   public UUID identity = UUID.randomUUID();
   public OffsetDateTime created = OffsetDateTime.now();
 
+  public UUID trackingIdentity;
+
   public String stereotype;
   public int version;
 

@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.kodapan.service.template.mq.*;
 import se.kodapan.service.template.util.Environment;
+import se.kodapan.service.template.util.Tracking;
 
 import java.util.Collections;
 import java.util.Map;
@@ -121,6 +122,9 @@ public class KafkaReader extends AbstractMessageQueueReader {
               if (!records.isEmpty()) {
                 for (ConsumerRecord<String, String> record : records) {
                   MessageQueueMessage message = getObjectMapper().readValue(record.value(), MessageQueueMessage.class);
+
+                  Tracking.getInstance().set(message.getTrackingIdentity());
+
                   try {
                     // consumerContext.setTopic(record.topic()); in case we allow multiple topics on the same consumer
                     consumerContext.setOffset(record.offset());

@@ -9,11 +9,16 @@ import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.Provides;
 import com.google.inject.name.Named;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.message.BasicHeader;
 import org.gwizard.web.WebConfig;
 import se.kodapan.service.template.util.Environment;
+import se.kodapan.service.template.util.Tracking;
 
 import javax.inject.Singleton;
 import java.time.Clock;
+import java.util.Collections;
 
 /**
  * @author kalle
@@ -69,5 +74,11 @@ public class ServiceModule implements Module {
     return Clock.systemUTC();
   }
 
+  @Provides
+  public CloseableHttpClient httpClientFactory() {
+    return HttpClientBuilder.create()
+        .setDefaultHeaders(Collections.singleton(new BasicHeader(Tracking.httpHeader, String.valueOf(Tracking.getInstance().get()))))
+        .build();
+  }
 
 }

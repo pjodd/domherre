@@ -24,6 +24,7 @@ public class ServletModule extends com.google.inject.servlet.ServletModule {
 
   @Override
   protected void configureServlets() {
+    filter("/*").through(TrackingFilter.class);
     install(new RestModule());
 
     bindPathAnnotatedClasses();

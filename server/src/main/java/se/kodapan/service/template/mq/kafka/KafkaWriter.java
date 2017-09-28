@@ -11,6 +11,7 @@ import se.kodapan.service.template.mq.MessageQueueMessage;
 import se.kodapan.service.template.mq.MessageQueueTopic;
 import se.kodapan.service.template.mq.MessageQueueWriter;
 import se.kodapan.service.template.util.Environment;
+import se.kodapan.service.template.util.Tracking;
 
 import java.util.Collections;
 import java.util.Map;
@@ -67,6 +68,9 @@ public class KafkaWriter implements MessageQueueWriter {
 
   @Override
   public void write(MessageQueueTopic topic, MessageQueueMessage message) throws Exception {
+    if (message.getTrackingIdentity() == null) {
+      message.setTrackingIdentity(Tracking.getInstance().get());
+    }
     write(topic, objectMapper.writeValueAsString(message));
   }
 

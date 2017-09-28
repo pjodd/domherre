@@ -31,20 +31,7 @@ public class TestService extends ServiceTest {
     int webConfigPort = 9000 + new Random().nextInt(1000);
     Environment.setDefaultValue("webConfig.port", webConfigPort);
 
-    Service service = new Service("test-" + System.currentTimeMillis()) {
-
-      @Override
-      public List<Class<? extends Initializable>> getInitializables() {
-        return Collections.singletonList(MessageQueuePrevalence.class);
-      }
-
-      @Override
-      public List<Module> getModules() {
-        List<Module> modules = new ArrayList<>();
-        modules.add(new PrevalenceModule(Root.class, getServiceName()));
-        return modules;
-      }
-    };
+    Service service = new Service("test-" + System.currentTimeMillis());
 
     Assert.assertTrue(service.open());
     try {
@@ -55,10 +42,5 @@ public class TestService extends ServiceTest {
       Assert.assertTrue(service.close());
     }
   }
-
-  @Data
-  public static class Root {
-
-  }
-
+  
 }

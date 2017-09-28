@@ -14,7 +14,6 @@ public class SwaggerDescription implements ReaderListener {
 
   @Override
   public void beforeScan(Reader reader, Swagger swagger) {
-
   }
 
   @Override
