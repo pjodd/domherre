@@ -1,5 +1,6 @@
 package se.kodapan.service.template.servlet;
 
+import com.google.inject.Singleton;
 import se.kodapan.service.template.util.Tracking;
 
 import javax.servlet.*;
@@ -11,6 +12,7 @@ import java.util.UUID;
  * @author kalle
  * @since 2017-09-29 00:46
  */
+@Singleton
 public class TrackingFilter implements Filter {
 
   @Override
