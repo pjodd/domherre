@@ -22,7 +22,7 @@ public class KafkaGetQueueEndOffset {
 
   private Logger log = LoggerFactory.getLogger(getClass());
 
-  private String kafkaBootstrapList = Environment.getValue("kafka.bootstrap.servers", "localhost:9092");
+  private String kafkaBootstrapList = Environment.getValue("kafka.bootstrap.servers", "kafka:9092");
 
   private CountDownLatch endLatch = new CountDownLatch(1);
   private long startOffset = -1;

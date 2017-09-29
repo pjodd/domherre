@@ -29,7 +29,7 @@ public class KafkaReader extends AbstractMessageQueueReader {
   private Poller poller;
   private Consumer<String, String> kafkaConsumer;
 
-  private String kafkaBootstrapList = Environment.getValue("kafka.bootstrap.servers", "localhost:9092");
+  private String kafkaBootstrapList = Environment.getValue("kafka.bootstrap.servers", "kafka:9092");
 
   private Map<String, String> getAdditionalKafkaProperties() {
     return Collections.EMPTY_MAP;

@@ -21,7 +21,6 @@ import java.util.concurrent.CountDownLatch;
 @Singleton
 public class KafkaFactory implements MessageQueueFactory {
 
-
   @Inject
   private ObjectMapper objectMapper;
 
@@ -37,13 +36,11 @@ public class KafkaFactory implements MessageQueueFactory {
 
   @Override
   public long getQueueEndOffset(MessageQueueTopic topic) {
-
     try {
       return new KafkaGetQueueEndOffset(topic).execute();
-    } catch (Exception ie) {
-      throw new RuntimeException(ie);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
-
   }
 
 }

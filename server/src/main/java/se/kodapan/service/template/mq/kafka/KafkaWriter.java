@@ -30,7 +30,7 @@ public class KafkaWriter implements MessageQueueWriter {
 
   private KafkaProducer<String, String> kafkaProducer;
 
-  private String kafkaBootstrapList = Environment.getValue("kafka.bootstrap.servers", "localhost:9092");
+  private String kafkaBootstrapList = Environment.getValue("kafka.bootstrap.servers", "kafka:9092");
 
   private Map<String, String> getAdditionalKafkaProperties() {
     return Collections.EMPTY_MAP;
