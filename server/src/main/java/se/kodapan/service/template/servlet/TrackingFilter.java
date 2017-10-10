@@ -5,6 +5,7 @@ import se.kodapan.service.template.util.Tracking;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.UUID;
 
@@ -30,6 +31,8 @@ public class TrackingFilter implements Filter {
       Tracking.getInstance().set(null);
     }
 
+    HttpServletResponse httpServletResponse = (HttpServletResponse)servletResponse;
+    httpServletResponse.setHeader(Tracking.httpHeader, Tracking.getInstance().get().toString());
   }
 
   @Override
