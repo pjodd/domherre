@@ -24,9 +24,8 @@ public class ServletModule extends com.google.inject.servlet.ServletModule {
 
   @Override
   protected void configureServlets() {
-    filter("/*").through(TrackingFilter.class);
+//    filter("/*").through(TrackingFilter.class);
     install(new RestModule());
-
     bindPathAnnotatedClasses();
   }
 
@@ -64,6 +63,8 @@ public class ServletModule extends com.google.inject.servlet.ServletModule {
       resourcePackages.add(pack.getName());
     }
     swaggerConfig = new SwaggerConfig();
+    swaggerConfig.setPrettyPrint(true);
+    swaggerConfig.setBasePath("/");
     swaggerConfig.setResourcePackages(resourcePackages);
 
   }

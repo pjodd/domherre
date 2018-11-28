@@ -1,20 +1,9 @@
 package se.kodapan.service.template;
 
-import com.google.inject.Binder;
-import com.google.inject.Module;
-import com.google.inject.name.Names;
 import junit.framework.Assert;
-import lombok.Data;
 import org.junit.Test;
-import se.kodapan.service.template.mq.MessageQueueFactory;
-import se.kodapan.service.template.mq.kafka.KafkaFactory;
-import se.kodapan.service.template.prevalence.MessageQueuePrevalence;
-import se.kodapan.service.template.prevalence.PrevalenceModule;
 import se.kodapan.service.template.util.Environment;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Random;
 
 /**

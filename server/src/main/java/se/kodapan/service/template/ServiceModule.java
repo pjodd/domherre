@@ -71,7 +71,7 @@ public class ServiceModule implements Module {
   @Provides
   @Singleton
   public Clock clockFactory() {
-    return Clock.systemUTC();
+    return Clock.systemDefaultZone();
   }
 
   @Provides

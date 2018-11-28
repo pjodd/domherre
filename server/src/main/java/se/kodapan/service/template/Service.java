@@ -8,8 +8,6 @@ import org.gwizard.services.Run;
 import org.gwizard.swagger.SwaggerModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import se.kodapan.service.template.prevalence.MessageQueuePrevalence;
-import se.kodapan.service.template.prevalence.PrevalenceModule;
 import se.kodapan.service.template.servlet.ServletModule;
 
 import java.util.ArrayList;
