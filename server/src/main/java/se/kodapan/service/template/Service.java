@@ -49,7 +49,7 @@ public class Service {
     modules.add(new ServiceModule(serviceName));
 
     modules.add(new ServletModule());
-    modules.add(new SwaggerModule()); // depends on actions in ServletModule
+    modules.add(new SwaggerModule()); // depends on actions in ServletModule. binds to /swagger.json
 
     modules.addAll(getModules());
 
