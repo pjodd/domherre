@@ -71,8 +71,17 @@ public class Service {
 
         long millisecondsSpent = System.currentTimeMillis() - started;
         if (millisecondsSpent > millisecondsTimeOut) {
-          log.error("Timeout opening initializables.");
-          // todo close any that we opened
+          log.error("Timeout opening initializables. Unable to open {}", unopnenedInitializables);
+
+          // close any that we opened
+          if (!openendInitializables.isEmpty()) {
+            log.info("Closing any initializables that was opened...");
+            for (Initializable initializable : openendInitializables) {
+              if (!initializable.close()) {
+                log.error("Unable to close " + initializable.toString());
+              }
+            }
+          }
 
           return false;
         }
