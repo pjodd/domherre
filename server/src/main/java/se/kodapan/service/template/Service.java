@@ -104,7 +104,7 @@ public class Service {
       notClosedInitializables.add(injector.getInstance(initializableClass));
     }
 
-    //    // todo retry for a while if unable
+    // todo retry for a while if unable
 
     boolean success = true;
 
