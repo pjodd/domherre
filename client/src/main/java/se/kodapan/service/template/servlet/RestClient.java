@@ -97,6 +97,11 @@ public abstract class RestClient implements Closeable {
     return httpClient.execute(put);
   }
 
+  protected CloseableHttpResponse put(String path) throws Exception {
+    HttpPut put = new HttpPut(appendPath(urlFactory(), path).toString());
+    return httpClient.execute(put);
+  }
+
   protected CloseableHttpResponse post(String path, Object object) throws Exception {
     return post(path, objectMapper.writeValueAsString(object));
   }
@@ -105,6 +110,11 @@ public abstract class RestClient implements Closeable {
     HttpPost post = new HttpPost(appendPath(urlFactory(), path).toString());
     post.addHeader(applicationJson);
     post.setEntity(new StringEntity(json, StandardCharsets.UTF_8));
+    return httpClient.execute(post);
+  }
+
+  protected CloseableHttpResponse post(String path) throws Exception {
+    HttpPost post = new HttpPost(appendPath(urlFactory(), path).toString());
     return httpClient.execute(post);
   }
 
