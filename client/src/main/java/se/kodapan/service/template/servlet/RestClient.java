@@ -8,6 +8,7 @@ import org.apache.http.client.methods.*;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicHeader;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,8 +71,18 @@ public abstract class RestClient implements Closeable {
     return sb;
   }
 
+  private StringBuilder appendPath(StringBuilder url, String path) {
+    if (path != null) {
+      while (path.startsWith("/")) {
+        path = path.substring(1);
+      }
+      url.append(path);
+    }
+    return url;
+  }
+
   protected CloseableHttpResponse get(String path) throws Exception {
-    HttpGet get = new HttpGet(urlFactory().append(path).toString());
+    HttpGet get = new HttpGet(appendPath(urlFactory(), path).toString());
     return httpClient.execute(get);
   }
 
@@ -80,7 +91,7 @@ public abstract class RestClient implements Closeable {
   }
 
   protected CloseableHttpResponse put(String path, String json) throws Exception {
-    HttpPut put = new HttpPut(urlFactory().append(path).toString());
+    HttpPut put = new HttpPut(appendPath(urlFactory(), path).toString());
     put.addHeader(applicationJson);
     put.setEntity(new StringEntity(json, StandardCharsets.UTF_8));
     return httpClient.execute(put);
@@ -91,14 +102,14 @@ public abstract class RestClient implements Closeable {
   }
 
   protected CloseableHttpResponse post(String path, String json) throws Exception {
-    HttpPost post = new HttpPost(urlFactory().append(path).toString());
+    HttpPost post = new HttpPost(appendPath(urlFactory(), path).toString());
     post.addHeader(applicationJson);
     post.setEntity(new StringEntity(json, StandardCharsets.UTF_8));
     return httpClient.execute(post);
   }
 
   protected CloseableHttpResponse delete(String path) throws Exception {
-    HttpDelete delete = new HttpDelete(urlFactory().append(path).toString());
+    HttpDelete delete = new HttpDelete(appendPath(urlFactory(), path).toString());
     return httpClient.execute(delete);
   }
 
@@ -106,6 +117,18 @@ public abstract class RestClient implements Closeable {
     try {
       if (response.getStatusLine().getStatusCode() >= 200 && response.getStatusLine().getStatusCode() <= 299) {
         return objectMapper.readValue(response.getEntity().getContent(), responseClass);
+      } else {
+        throw new IOException("HTTP " + response.getStatusLine().getStatusCode());
+      }
+    } finally {
+      response.close();
+    }
+  }
+
+  protected void consume(CloseableHttpResponse response) throws IOException {
+    try {
+      if (response.getStatusLine().getStatusCode() >= 200 && response.getStatusLine().getStatusCode() <= 299) {
+        EntityUtils.consume(response.getEntity());
       } else {
         throw new IOException("HTTP " + response.getStatusLine().getStatusCode());
       }
@@ -123,6 +146,5 @@ public abstract class RestClient implements Closeable {
       log.warn("Caught exception while closing {}", httpClient, ioe);
     }
   }
-
 
 }
