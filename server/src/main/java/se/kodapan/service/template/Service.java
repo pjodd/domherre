@@ -49,7 +49,7 @@ public class Service {
     modules.add(new ServiceModule(serviceName));
 
     modules.add(new ServletModule());
-    modules.add(new SwaggerModule()); // depends on actions in ServletModule
+    modules.add(new SwaggerModule()); // depends on actions in ServletModule. binds to /swagger.json
 
     modules.addAll(getModules());
 
@@ -71,8 +71,17 @@ public class Service {
 
         long millisecondsSpent = System.currentTimeMillis() - started;
         if (millisecondsSpent > millisecondsTimeOut) {
-          log.error("Timeout opening initializables.");
-          // todo close any that we opened
+          log.error("Timeout opening initializables. Unable to open {}", unopnenedInitializables);
+
+          // close any that we opened
+          if (!openendInitializables.isEmpty()) {
+            log.info("Closing any initializables that was opened...");
+            for (Initializable initializable : openendInitializables) {
+              if (!initializable.close()) {
+                log.error("Unable to close " + initializable.toString());
+              }
+            }
+          }
 
           return false;
         }
@@ -104,7 +113,7 @@ public class Service {
       notClosedInitializables.add(injector.getInstance(initializableClass));
     }
 
-    //    // todo retry for a while if unable
+    // todo retry for a while if unable
 
     boolean success = true;
 

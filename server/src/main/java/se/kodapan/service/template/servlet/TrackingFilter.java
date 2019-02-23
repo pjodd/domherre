@@ -33,6 +33,8 @@ public class TrackingFilter implements Filter {
 
     HttpServletResponse httpServletResponse = (HttpServletResponse)servletResponse;
     httpServletResponse.setHeader(Tracking.httpHeader, Tracking.getInstance().get().toString());
+
+    filterChain.doFilter(httpServletRequest, httpServletResponse);
   }
 
   @Override

@@ -8,7 +8,7 @@ import java.util.UUID;
  */
 public class Tracking {
   
-  public static final String httpHeader = "X-TRACKING-IDENTITY";
+  public static final String httpHeader = "X-KODAPAN-TRACKING-IDENTITY";
 
   private Tracking() { }
   private static Tracking instance = new Tracking();
