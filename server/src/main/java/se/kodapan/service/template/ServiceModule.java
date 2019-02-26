@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.inject.Binder;
-import com.google.inject.Module;
 import com.google.inject.Provides;
 import com.google.inject.name.Named;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -24,24 +23,23 @@ import java.util.Collections;
  * @author kalle
  * @since 2017-02-15 02:28
  */
-public class ServiceModule implements Module {
+public class ServiceModule extends AbstractServiceModule {
 
   public static final String SERVICE_NAME = "service name";
 
-  private String serviceName;
-
   public ServiceModule(String serviceName) {
-    this.serviceName = serviceName;
+    super(serviceName);
   }
 
   @Override
   public void configure(Binder binder) {
   }
 
+  @Override
   @Provides
   @Named(SERVICE_NAME)
-  public String serviceNameFactory() {
-    return serviceName;
+  public String getServiceName() {
+    return super.getServiceName();
   }
 
 

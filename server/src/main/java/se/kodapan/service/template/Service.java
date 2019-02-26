@@ -31,6 +31,16 @@ public class Service {
     this.serviceName = serviceName;
   }
 
+  /**
+   * All modules, including all service modules.
+   */
+  private List<Module> modules;
+
+  /**
+   * Modules aware of service name, containing initializable configurations, etc
+   */
+  private List<AbstractServiceModule> serviceModules;
+
   @Getter
   private Injector injector;
 
@@ -44,12 +54,21 @@ public class Service {
 
   public boolean open() throws Exception {
 
-    List<Module> modules = new ArrayList<>();
+
+    serviceModules = new ArrayList<>();
+    modules = new ArrayList<>();
 
     modules.add(new ServiceModule(serviceName));
 
     modules.add(new ServletModule());
     modules.add(new SwaggerModule()); // depends on actions in ServletModule. binds to /swagger.json
+
+    for (Module module : getModules()) {
+      modules.add(module);
+      if (module instanceof AbstractServiceModule) {
+        serviceModules.add((AbstractServiceModule) module);
+      }
+    }
 
     modules.addAll(getModules());
 
@@ -59,9 +78,11 @@ public class Service {
     {
       List<Initializable> unopnenedInitializables = new ArrayList<>();
 
-      for (Class<? extends Initializable> initializableClass : getInitializables()) {
-        Initializable initializable = injector.getInstance(initializableClass);
-        unopnenedInitializables.add(initializable);
+      for (AbstractServiceModule serviceModule : serviceModules) {
+        for (Class<? extends Initializable> initializableClass : serviceModule.getInitializables()) {
+          Initializable initializable = injector.getInstance(initializableClass);
+          unopnenedInitializables.add(initializable);
+        }
       }
 
       List<Initializable> openendInitializables = new ArrayList<>();
@@ -109,8 +130,10 @@ public class Service {
   public boolean close() throws Exception {
 
     List<Initializable> notClosedInitializables = new ArrayList<>();
-    for (Class<? extends Initializable> initializableClass : getInitializables()) {
-      notClosedInitializables.add(injector.getInstance(initializableClass));
+    for (AbstractServiceModule serviceModule : serviceModules) {
+      for (Class<? extends Initializable> initializableClass : serviceModule.getInitializables()) {
+        notClosedInitializables.add(injector.getInstance(initializableClass));
+      }
     }
 
     // todo retry for a while if unable
@@ -125,10 +148,6 @@ public class Service {
     }
 
     return success;
-  }
-
-  public List<Class<? extends Initializable>> getInitializables() {
-    return Collections.emptyList();
   }
 
   public List<Module> getModules() {
