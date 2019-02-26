@@ -12,10 +12,13 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
 import org.gwizard.web.WebConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import se.kodapan.service.template.util.Environment;
 import se.kodapan.service.template.util.Tracking;
 
 import javax.inject.Singleton;
+import java.io.File;
 import java.time.Clock;
 import java.util.Collections;
 
@@ -25,14 +28,38 @@ import java.util.Collections;
  */
 public class ServiceModule extends AbstractServiceModule {
 
+  private Logger log = LoggerFactory.getLogger(getClass());
+
   public static final String SERVICE_NAME = "service name";
+  public static final String SERVICE_DATA_PATH = "service data path";
+  public static final String SERVICE_DATA_PATH_PREFIX_ENV = "service-data-path-prefix";
 
   public ServiceModule(String serviceName) {
     super(serviceName);
   }
 
+  private File serviceDataPath;
+
   @Override
   public void configure(Binder binder) {
+    String serviceDataPathPrefix = Environment.getValue(SERVICE_DATA_PATH_PREFIX_ENV, (String)null);
+    if (serviceDataPathPrefix == null) {
+      log.error("Service data path prefix environment {} is not set.\nEnvironment.setDefaultValue(ServiceModule.SERVICE_DATA_PATH_PREFIX_ENV, \"/srv/project/\");", SERVICE_DATA_PATH_PREFIX_ENV);
+      throw new RuntimeException("Service data path prefix environment '"+SERVICE_DATA_PATH_PREFIX_ENV+"' is not set.\nEnvironment.setDefaultValue(ServiceModule.SERVICE_DATA_PATH_PREFIX_ENV, \"/srv/project/\");");
+    }
+    serviceDataPath = new File(serviceDataPathPrefix);
+    serviceDataPath = new File(serviceDataPath, getServiceName());
+    if (!serviceDataPath.exists()) {
+      log.info("Creating service path {}", serviceDataPath.getAbsolutePath());
+      if (!serviceDataPath.mkdirs()) {
+        log.error("Unable to mkdirs {}", serviceDataPath.getAbsolutePath());
+        throw new RuntimeException("Unable to mkdirs " + serviceDataPath.getAbsolutePath());
+      }
+    }
+    if (!serviceDataPath.isDirectory()) {
+      log.error("Service data path {} is not a directory", serviceDataPath.getAbsolutePath());
+      throw new RuntimeException("Service data path " + serviceDataPath.getAbsolutePath() + " is not a directory");
+    }
   }
 
   @Override
@@ -40,6 +67,12 @@ public class ServiceModule extends AbstractServiceModule {
   @Named(SERVICE_NAME)
   public String getServiceName() {
     return super.getServiceName();
+  }
+
+  @Provides
+  @Named(SERVICE_DATA_PATH)
+  public File getServiceDataPath() {
+    return serviceDataPath;
   }
 
 
