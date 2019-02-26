@@ -70,8 +70,6 @@ public class Service {
       }
     }
 
-    modules.addAll(getModules());
-
     injector = Guice.createInjector(modules);
 
 
