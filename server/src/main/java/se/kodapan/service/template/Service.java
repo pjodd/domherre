@@ -54,8 +54,6 @@ public class Service {
 
   public boolean open() throws Exception {
 
-
-    serviceModules = new ArrayList<>();
     modules = new ArrayList<>();
 
     modules.add(new ServiceModule(serviceName));
@@ -65,6 +63,10 @@ public class Service {
 
     for (Module module : getModules()) {
       modules.add(module);
+    }
+
+    serviceModules = new ArrayList<>();
+    for (Module module : modules) {
       if (module instanceof AbstractServiceModule) {
         serviceModules.add((AbstractServiceModule) module);
       }
@@ -72,55 +74,53 @@ public class Service {
 
     injector = Guice.createInjector(modules);
 
+    List<Initializable> unopnenedInitializables = new ArrayList<>();
 
-    {
-      List<Initializable> unopnenedInitializables = new ArrayList<>();
-
-      for (AbstractServiceModule serviceModule : serviceModules) {
-        for (Class<? extends Initializable> initializableClass : serviceModule.getInitializables()) {
-          Initializable initializable = injector.getInstance(initializableClass);
-          unopnenedInitializables.add(initializable);
-        }
+    for (AbstractServiceModule serviceModule : serviceModules) {
+      for (Class<? extends Initializable> initializableClass : serviceModule.getInitializables()) {
+        Initializable initializable = injector.getInstance(initializableClass);
+        unopnenedInitializables.add(initializable);
       }
+    }
 
-      List<Initializable> openendInitializables = new ArrayList<>();
-      long millisecondsTimeOut = TimeUnit.MINUTES.toMillis(1);
-      long started = System.currentTimeMillis();
-      while (!unopnenedInitializables.isEmpty()) {
+    List<Initializable> openendInitializables = new ArrayList<>();
+    long millisecondsTimeOut = TimeUnit.MINUTES.toMillis(1);
+    long started = System.currentTimeMillis();
+    while (!unopnenedInitializables.isEmpty()) {
 
-        long millisecondsSpent = System.currentTimeMillis() - started;
-        if (millisecondsSpent > millisecondsTimeOut) {
-          log.error("Timeout opening initializables. Unable to open {}", unopnenedInitializables);
+      long millisecondsSpent = System.currentTimeMillis() - started;
+      if (millisecondsSpent > millisecondsTimeOut) {
+        log.error("Timeout opening initializables. Unable to open {}", unopnenedInitializables);
 
-          // close any that we opened
-          if (!openendInitializables.isEmpty()) {
-            log.info("Closing any initializables that was opened...");
-            for (Initializable initializable : openendInitializables) {
-              if (!initializable.close()) {
-                log.error("Unable to close " + initializable.toString());
-              }
+        // close any that we opened
+        if (!openendInitializables.isEmpty()) {
+          log.info("Closing any initializables that was opened...");
+          for (Initializable initializable : openendInitializables) {
+            if (!initializable.close()) {
+              log.error("Unable to close " + initializable.toString());
             }
           }
-
-          return false;
         }
 
-        for (Iterator<Initializable> iterator = unopnenedInitializables.iterator(); iterator.hasNext(); ) {
-          Initializable initializable = iterator.next();
-          if (initializable.open()) {
-            iterator.remove();
-            openendInitializables.add(initializable);
-            log.info("Initialized " + initializable);
-          } else {
-            log.warn("Unable to initialize " + initializable);
-          }
-        }
+        return false;
       }
 
-      long ended = System.currentTimeMillis();
-      long millisecondsSpent = ended - started;
-      log.info(millisecondsSpent + " milliseconds spent opening all initializables.");
+      for (Iterator<Initializable> iterator = unopnenedInitializables.iterator(); iterator.hasNext(); ) {
+        Initializable initializable = iterator.next();
+        if (initializable.open()) {
+          iterator.remove();
+          openendInitializables.add(initializable);
+          log.info("Initialized " + initializable);
+        } else {
+          log.warn("Unable to initialize " + initializable);
+        }
+      }
     }
+
+    long ended = System.currentTimeMillis();
+    long millisecondsSpent = ended - started;
+    log.info(millisecondsSpent + " milliseconds spent opening all initializables.");
+
 
     return true;
   }
