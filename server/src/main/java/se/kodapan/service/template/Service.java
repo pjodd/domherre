@@ -61,9 +61,7 @@ public class Service {
     modules.add(new ServletModule());
     modules.add(new SwaggerModule()); // depends on actions in ServletModule. binds to /swagger.json
 
-    for (Module module : getModules()) {
-      modules.add(module);
-    }
+    modules.addAll(getModules());
 
     serviceModules = new ArrayList<>();
     for (Module module : modules) {
@@ -133,14 +131,24 @@ public class Service {
         notClosedInitializables.add(injector.getInstance(initializableClass));
       }
     }
+    // close everything in reverse order that they where opened, in case of dependencies.
+    Collections.reverse(notClosedInitializables);
 
     // todo retry for a while if unable
 
     boolean success = true;
 
-    for (Initializable initializable : notClosedInitializables) {
-      if (!initializable.close()) {
-        log.error("Unable to close " + initializable.toString());
+    for (Iterator<Initializable> iterator = notClosedInitializables.iterator(); iterator.hasNext(); ) {
+      Initializable initializable = iterator.next();
+      try {
+        if (initializable.close()) {
+          iterator.remove();
+        } else {
+          log.error("Unable to close " + initializable.toString());
+          success = false;
+        }
+      } catch (Exception e) {
+        log.error("Caught exception trying to close {}", initializable, e);
         success = false;
       }
     }
