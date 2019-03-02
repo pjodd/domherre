@@ -61,6 +61,12 @@ public class Service {
     modules.add(new ServletModule());
     modules.add(new SwaggerModule()); // depends on actions in ServletModule. binds to /swagger.json
 
+    // begin templates
+    // insert template modules here in order to have them initialized prior to user modules.
+
+
+    // end templates
+
     modules.addAll(getModules());
 
     serviceModules = new ArrayList<>();
