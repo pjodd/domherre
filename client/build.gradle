@@ -7,7 +7,7 @@ plugins {
 description = 'client'
 
 dependencies {
-  compile project(':domain')
+  compile project(':' + rootProject.name + '-domain')
 
   compile group: 'com.google.inject', name: 'guice', version:'4.1.0'
 

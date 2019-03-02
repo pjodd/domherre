@@ -7,7 +7,7 @@ plugins {
 description = 'server'
 
 dependencies {
-  compile project(':domain')
+  compile project(':' + rootProject.name + '-domain')
 
   def withoutServletApi = { exclude group: 'javax.servlet', module: 'servlet-api'}
 

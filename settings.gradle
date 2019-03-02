@@ -1,4 +1,6 @@
-rootProject.name = 'java-service-template'
-include ':domain'
-include ':server'
-include ':client'
+def prefix(prefix) {
+    rootProject.name = prefix
+    rootProject.children.each { it.name = "${prefix}-${it.name}" }
+}
+include 'domain', 'server', 'client'
+prefix('java-service-template')
