@@ -63,7 +63,7 @@ public abstract class RestClient implements Closeable {
     StringBuilder sb = new StringBuilder(128)
         .append("http://").append(getHostName())
         .append(":").append(String.valueOf(getPort()))
-        .append("://api/");
+        .append("/api/");
     if (getPathPrefix() != null) {
       sb.append(getPathPrefix());
       sb.append("/");
@@ -126,7 +126,7 @@ public abstract class RestClient implements Closeable {
   protected <R> R parse(CloseableHttpResponse response, Class<R> responseClass) throws IOException {
     try {
       if (response.getStatusLine().getStatusCode() >= 200 && response.getStatusLine().getStatusCode() <= 299) {
-        return objectMapper.readValue(response.getEntity().getContent(), responseClass);
+        return response.getEntity().getContentLength() == 0 ? null : objectMapper.readValue(response.getEntity().getContent(), responseClass);
       } else {
         throw new IOException("HTTP " + response.getStatusLine().getStatusCode());
       }
