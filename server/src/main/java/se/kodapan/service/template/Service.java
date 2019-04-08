@@ -3,6 +3,7 @@ package se.kodapan.service.template;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
+import com.google.inject.Singleton;
 import lombok.Getter;
 import org.gwizard.services.Run;
 import org.gwizard.swagger.SwaggerModule;
@@ -83,6 +84,9 @@ public class Service {
     for (AbstractServiceModule serviceModule : serviceModules) {
       for (Class<? extends Initializable> initializableClass : serviceModule.getInitializables()) {
         Initializable initializable = injector.getInstance(initializableClass);
+        if (initializableClass.getAnnotation(Singleton.class) == null) {
+          throw new RuntimeException("Initializable "+initializableClass.getName()+" is not annotated as Singleton!");
+        }
         unopnenedInitializables.add(initializable);
       }
     }
