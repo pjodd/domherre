@@ -1,5 +1,6 @@
 package se.kodapan.service.template.servlet;
 
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import lombok.Getter;
@@ -15,6 +16,9 @@ import org.slf4j.LoggerFactory;
 import java.io.Closeable;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
+import java.util.Set;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -127,6 +131,19 @@ public abstract class RestClient implements Closeable {
     try {
       if (response.getStatusLine().getStatusCode() >= 200 && response.getStatusLine().getStatusCode() <= 299) {
         return response.getEntity().getContentLength() == 0 ? null : objectMapper.readValue(response.getEntity().getContent(), responseClass);
+      } else {
+        throw new IOException("HTTP " + response.getStatusLine().getStatusCode());
+      }
+    } finally {
+      response.close();
+    }
+  }
+
+  protected <R extends Collection<T>, T> R parse(CloseableHttpResponse response, Class<R> collectionClass, Class<T> typeClass) throws IOException {
+    try {
+      if (response.getStatusLine().getStatusCode() >= 200 && response.getStatusLine().getStatusCode() <= 299) {
+        JavaType type = objectMapper.getTypeFactory().constructCollectionType(collectionClass, typeClass);
+        return response.getEntity().getContentLength() == 0 ? null : objectMapper.readValue(response.getEntity().getContent(), type);
       } else {
         throw new IOException("HTTP " + response.getStatusLine().getStatusCode());
       }
