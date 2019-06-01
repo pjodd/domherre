@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import lombok.Getter;
+import lombok.Setter;
 import org.apache.http.Header;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.*;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -19,6 +21,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -87,7 +90,7 @@ public abstract class RestClient implements Closeable {
 
   protected CloseableHttpResponse get(String path) throws Exception {
     HttpGet get = new HttpGet(appendPath(urlFactory(), path).toString());
-    return httpClient.execute(get);
+    return execute(get);
   }
 
   protected CloseableHttpResponse put(String path, Object object) throws Exception {
@@ -114,17 +117,17 @@ public abstract class RestClient implements Closeable {
     HttpPost post = new HttpPost(appendPath(urlFactory(), path).toString());
     post.addHeader(applicationJson);
     post.setEntity(new StringEntity(json, StandardCharsets.UTF_8));
-    return httpClient.execute(post);
+    return execute(post);
   }
 
   protected CloseableHttpResponse post(String path) throws Exception {
     HttpPost post = new HttpPost(appendPath(urlFactory(), path).toString());
-    return httpClient.execute(post);
+    return execute(post);
   }
 
   protected CloseableHttpResponse delete(String path) throws Exception {
     HttpDelete delete = new HttpDelete(appendPath(urlFactory(), path).toString());
-    return httpClient.execute(delete);
+    return execute(delete);
   }
 
   protected <R> R parse(CloseableHttpResponse response, Class<R> responseClass) throws IOException {
@@ -171,6 +174,49 @@ public abstract class RestClient implements Closeable {
       httpClient.close();
     } catch (IOException ioe) {
       log.warn("Caught exception while closing {}", httpClient, ioe);
+    }
+  }
+
+  public static long defaultMaximumMillisecondsRetrying = TimeUnit.MINUTES.toMillis(5);
+  public static long defaultMillisecondsBetweenRetries = TimeUnit.SECONDS.toMillis(10);
+
+  @Getter
+  @Setter
+  private long maximumMillisecondsRetrying = defaultMaximumMillisecondsRetrying;
+
+  @Getter
+  @Setter
+  private long millisecondsBetweenRetries = defaultMillisecondsBetweenRetries;
+
+  private CloseableHttpResponse execute(HttpUriRequest request) throws IOException, ClientProtocolException {
+    return execute(request, maximumMillisecondsRetrying, millisecondsBetweenRetries);
+  }
+
+  private CloseableHttpResponse execute(HttpUriRequest request, long maximumMillisecondsRetrying, long millisecondsBetweenRetries) throws IOException, ClientProtocolException {
+    int retry = 0;
+    long timeout = System.currentTimeMillis() + maximumMillisecondsRetrying;
+    while (true) {
+      try {
+        return httpClient.execute(request);
+      } catch (java.net.ConnectException connectException) {
+        if ("Connection refused".equals(connectException.getMessage())) {
+          if (timeout > System.currentTimeMillis() + millisecondsBetweenRetries){
+            try {
+              retry++;
+              if (log.isDebugEnabled()) {
+                log.debug("Connection refused. Sleeping for {} milliseconds before retry #{}", millisecondsBetweenRetries, retry);
+              }
+              Thread.sleep(millisecondsBetweenRetries);
+            } catch (InterruptedException ie) {
+              log.warn("Caught interruption", ie);
+            }
+          } else {
+            throw connectException;
+          }
+        } else {
+          throw connectException;
+        }
+      }
     }
   }
 
